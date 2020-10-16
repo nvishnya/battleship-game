@@ -6,11 +6,14 @@ verify_ssl = true
 [dev-packages]
 pylint = "*"
 autopep8 = "*"
+pytest-django = "*"
+pytest-cov = "*"
 
 [packages]
 django = "*"
 numpy = "*"
 scipy = "*"
+django-picklefield = "*"
 
 [requires]
 python_version = "3.8"
