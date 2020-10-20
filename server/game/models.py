@@ -80,11 +80,17 @@ class Board(models.Model):
         return Board.objects.create(board=board, shots=shots)
 
     @staticmethod
+    def get_number_of_ships_per_player(rows, cols):
+        # rows or cols > 5!
+        size = np.min([rows, cols])
+        return np.int8(np.floor(size - (6 + 4 * (size / 5 - 2))))
+
+    @staticmethod
     def get_ships_lengths(rows, cols):
-        #         biggest_ship 6 + (size - 10)
-        temp = np.arange(4, 0, -1)
+        biggest = Board.get_number_of_ships_per_player(rows, cols)
+        temp = np.arange(1, biggest + 1, 1)
         lengths = np.concatenate([np.full((i), j) for i, j in zip(temp, temp[::-1])])
-        np.random.shuffle(lengths)
+        print(lengths)
         return lengths
 
     @staticmethod
@@ -96,12 +102,13 @@ class Board(models.Model):
 
         for length in ships_lengths:
             rows, cols = Ship.generate_random_ship(length).values()
-            index = np.random.choice(np.arange(possible_coordinates.shape[0]))
-            x, y = possible_coordinates[index]
+            ind = np.random.choice(possible_coordinates.shape[0])
+            x, y = possible_coordinates[ind]
 
             while not Board.is_placement_possible(board, x, y, rows, cols):
-                index = np.random.choice(np.arange(possible_coordinates.shape[0]))
-                x, y = possible_coordinates[index]
+                possible_coordinates = np.delete(possible_coordinates, ind, axis=0)
+                ind = np.random.choice(possible_coordinates.shape[0])
+                x, y = possible_coordinates[ind]
 
             data = {"rows": rows, "cols": cols, "x": x, "y": y}
             board[Ship._get_indicies(data)] = 1
@@ -211,6 +218,7 @@ class Ship(models.Model):
                     coordinates.append(Coordinate(ship=ship, x=ship.x+row, y=ship.y+col))
 
         Coordinate.objects.bulk_create(coordinates)
+
 
 class Coordinate(models.Model):
     x = models.IntegerField()

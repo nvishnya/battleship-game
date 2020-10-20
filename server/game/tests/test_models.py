@@ -112,6 +112,17 @@ def test_board_shoot(db, board10x10):
     assert Coordinate.objects.get(x=0, y=0, ship__board=board10x10).is_hit
 
 
+@pytest.mark.parametrize("rows, cols, expected", [
+    (10, 10, 4),
+    (10, 15, 4),
+    (15, 15, 5),
+    (20, 15, 5),
+    (20, 20, 6),
+])
+def test_board_get_number_of_ships_per_player(db, rows, cols, expected):
+    assert Board.get_number_of_ships_per_player(rows, cols) == expected
+
+
 def test_board_generate_initial_board(db, board10x10):
     ships_data = Board.generate_initial_board(10, 10)
     assert board10x10.place_ships(*ships_data)
