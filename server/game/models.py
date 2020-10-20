@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator, MaxValueValidator
 from picklefield.fields import PickledObjectField
 from django.forms.models import model_to_dict
 from builtins import staticmethod
@@ -16,46 +17,10 @@ class Player(models.Model):
         return Player.objects.create(username=username, board=board)
 
 
-class Game(models.Model):
-    rows = models.IntegerField()
-    cols = models.IntegerField()
-
-    is_over = models.BooleanField(default=False)
-    winner = models.ForeignKey('Player', on_delete=models.deletion.CASCADE,
-                               related_name="winner", null=True, blank=True)
-    current = models.ForeignKey('Player', on_delete=models.deletion.CASCADE, related_name="current")
-    playerA = models.ForeignKey('Player', on_delete=models.deletion.CASCADE, related_name="playerA")
-    playerB = models.ForeignKey('Player', on_delete=models.deletion.CASCADE,
-                                related_name="playerB", null=True, blank=True)
-
-    @staticmethod
-    def create(username, rows, cols):
-        player = Player.create(username, rows, cols)
-        return Game.objects.create(rows=rows, cols=cols, playerA=player, current=player)
-
-    def join(self, username):
-        player = Player.create(username, self.rows, self.cols)
-        self.playerB = player
-        self.save(update_fields=['playerB'])
-
-    def next_player(self):
-        self.current = self.playerA if self.current != self.playerA else self.playerB
-        self.save(force_update=True)
-
-    def shoot(self, player, x, y):
-        if player != self.current:
-            return
-        opponent = self.playerA if self.current == self.playerB else self.playerB
-        hit = opponent.board.shoot(x, y)
-        if hit:
-            self.is_over = True if opponent.board.ships_alive == 0 else False
-            self.winner = self.current
-            self.save(update_fields=['is_over', 'winner'])
-        else:
-            self.next_player()
-
-
 class Board(models.Model):
+    MAX_SIZE = 20
+    MIN_SIZE = 5
+
     board = PickledObjectField()
     shots = PickledObjectField()
 
@@ -90,7 +55,6 @@ class Board(models.Model):
         biggest = Board.get_number_of_ships_per_player(rows, cols)
         temp = np.arange(1, biggest + 1, 1)
         lengths = np.concatenate([np.full((i), j) for i, j in zip(temp, temp[::-1])])
-        print(lengths)
         return lengths
 
     @staticmethod
@@ -163,6 +127,47 @@ class Board(models.Model):
         array = array.copy()
         array[Ship._get_indicies(data, offset=True)] = True
         return array
+
+
+class Game(models.Model):
+    rows = models.IntegerField(validators=[MinValueValidator(
+        Board.MIN_SIZE), MaxValueValidator(Board.MAX_SIZE)])
+    cols = models.IntegerField(validators=[MinValueValidator(
+        Board.MIN_SIZE), MaxValueValidator(Board.MAX_SIZE)])
+
+    is_over = models.BooleanField(default=False)
+    winner = models.ForeignKey('Player', on_delete=models.deletion.CASCADE,
+                               related_name="winner", null=True, blank=True)
+    current = models.ForeignKey('Player', on_delete=models.deletion.CASCADE, related_name="current")
+    playerA = models.ForeignKey('Player', on_delete=models.deletion.CASCADE, related_name="playerA")
+    playerB = models.ForeignKey('Player', on_delete=models.deletion.CASCADE,
+                                related_name="playerB", null=True, blank=True)
+
+    @staticmethod
+    def create(username, rows, cols):
+        player = Player.create(username, rows, cols)
+        return Game.objects.create(rows=rows, cols=cols, playerA=player, current=player)
+
+    def join(self, username):
+        player = Player.create(username, self.rows, self.cols)
+        self.playerB = player
+        self.save(update_fields=['playerB'])
+
+    def next_player(self):
+        self.current = self.playerA if self.current != self.playerA else self.playerB
+        self.save(force_update=True)
+
+    def shoot(self, player, x, y):
+        if player != self.current:
+            return
+        opponent = self.playerA if self.current == self.playerB else self.playerB
+        hit = opponent.board.shoot(x, y)
+        if hit:
+            self.is_over = True if opponent.board.ships_alive == 0 else False
+            self.winner = self.current
+            self.save(update_fields=['is_over', 'winner'])
+        else:
+            self.next_player()
 
 
 class Ship(models.Model):
