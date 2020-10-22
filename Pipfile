@@ -14,6 +14,7 @@ django = "*"
 numpy = "*"
 scipy = "*"
 django-picklefield = "*"
+djangorestframework = "*"
 
 [requires]
 python_version = "3.8"
