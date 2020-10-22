@@ -1,6 +1,7 @@
 from game.models import Board, Ship, Coordinate, Game, Player
 import numpy as np
 import pytest
+from django.forms.models import model_to_dict
 
 
 @pytest.fixture
@@ -96,9 +97,8 @@ def test_board_mark_surrounding_cells(db, board10x10):
     board10x10.place_ships(ship1x1_at0x0_data)
     ship = board10x10.ship_set.all()[0]
     board10x10.mark_surrounding_cells(ship)
-    assert np.all(board10x10.shots[ship.x - 1: ship.x + ship.rows + 1,
-                                   ship.y - 1: ship.y + ship.cols + 1])
-
+    around = board10x10.shots[Ship._get_indicies(model_to_dict(ship), offset=True)]
+    assert around[around > 0].size == 3
 
 def test_board_place_ships(db, board10x10):
     assert board10x10.place_ships(ship1x1_at0x0_data)
@@ -109,6 +109,7 @@ def test_board_shoot(db, board10x10):
     board10x10.place_ships(ship1x1_at0x0_data)
     assert not board10x10.shoot(1, 1)
     assert board10x10.shoot(0, 0)
+    assert board10x10.shots[0, 0] == 2
     assert Coordinate.objects.get(x=0, y=0, ship__board=board10x10).is_hit
 
 

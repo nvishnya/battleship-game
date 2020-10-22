@@ -21,12 +21,15 @@ class Board(models.Model):
     MAX_SIZE = 20
     MIN_SIZE = 5
 
+    MISS = 1
+    HIT = 2
+
     board = PickledObjectField()
     shots = PickledObjectField()
 
     def shoot(self, x, y):
-        self.shots[x, y] = True
         if self.board[x, y] > 0:
+            self.shots[x, y] = Board.HIT
             self.board[x, y] = -1
             coordinate = Coordinate.objects.get(x=x, y=y, ship__board=self)
             coordinate.hit()
@@ -35,13 +38,14 @@ class Board(models.Model):
                 self.mark_surrounding_cells(coordinate.ship)
             return True
         else:
+            self.shots[x, y] = Board.MISS
             self.save(update_fields=['shots'])
             return False
 
     @staticmethod
     def create(rows, cols):
         board = np.zeros((rows, cols), dtype=np.int8)
-        shots = np.zeros((rows, cols), dtype=np.bool8)
+        shots = np.zeros((rows, cols), dtype=np.int8)
         return Board.objects.create(board=board, shots=shots)
 
     @staticmethod
@@ -124,9 +128,10 @@ class Board(models.Model):
 
     @staticmethod
     def _mark_surrounding_cells(array, data):
-        array = array.copy()
-        array[Ship._get_indicies(data, offset=True)] = True
-        return array
+        new_array = array.copy()
+        new_array[Ship._get_indicies(data, offset=True)] = Board.MISS
+        new_array[Ship._get_indicies(data)] = array[Ship._get_indicies(data)]
+        return new_array
 
 
 class Game(models.Model):
