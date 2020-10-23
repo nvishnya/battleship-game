@@ -6,8 +6,8 @@ from django.forms.models import model_to_dict
 
 @pytest.fixture
 def player_factory(db):
-    def create_player(username, rows, cols):
-        return Player.create(username, rows, cols)
+    def create_player(channel):
+        return Player.create(channel)
     return create_player
 
 
@@ -16,14 +16,14 @@ def player_factory(db):
 
 @pytest.fixture
 def board_factory(db):
-    def create_board(rows=10, cols=10,):
-        return Board.create(rows, cols)
+    def create_board(player, rows=10, cols=10,):
+        return Board.create(player, rows, cols)
     return create_board
 
 
 @pytest.fixture
-def board10x10(db, board_factory):
-    return board_factory()
+def board10x10(db, board_factory, player_factory):
+    return board_factory(player_factory('channel'))
 
 
 @pytest.fixture
@@ -100,6 +100,7 @@ def test_board_mark_surrounding_cells(db, board10x10):
     around = board10x10.shots[Ship._get_indicies(model_to_dict(ship), offset=True)]
     assert around[around > 0].size == 3
 
+
 def test_board_place_ships(db, board10x10):
     assert board10x10.place_ships(ship1x1_at0x0_data)
     assert not board10x10.place_ships(ship_invalid)
@@ -171,33 +172,33 @@ def test_ship_generate_random_ship(db):
 
 @pytest.fixture
 def game_factory(db):
-    def create_game(username, rows, cols):
-        return Game.create(username, rows, cols)
+    def create_game(player, rows, cols):
+        return Game.create(player, rows, cols)
     return create_game
 
 
 @pytest.fixture
-def gameA(db, game_factory):
-    return game_factory('playerA', 10, 10)
+def gameA(db, player_factory, game_factory):
+    return game_factory(player_factory('playerA'), 10, 10)
 
 
 @pytest.fixture
 def gameAB(db, game_factory, player_factory):
-    game = game_factory('playerA', 10, 10)
-    game.playerB = player_factory('playerB', 10, 10)
-    game.save(update_fields=['playerB'])
+    game = game_factory(player_factory('channelA'), 10, 10)
+    game.join(player_factory('channelB'))
     return game
 
 
-def test_game_join_game(db, gameA):
-    gameA.join('playerB')
-    assert gameA.playerB.username == 'playerB'
+def test_game_join_game(db, player_factory, gameA):
+    player = player_factory('channel')
+    gameA.join(player)
+    assert gameA.playerB == player
 
 
 def test_game_next_player(db, gameAB):
-    assert gameAB.current.username == 'playerA'
+    assert gameAB.current == gameAB.playerA
     gameAB.next_player()
-    assert gameAB.current.username == 'playerB'
+    assert gameAB.current == gameAB.playerB
 
 
 def test_game_shoot(db, gameAB):

@@ -8,16 +8,17 @@ import numpy as np
 
 
 class Player(models.Model):
-    username = models.CharField(max_length=25, unique=True)
-    board = models.ForeignKey('Board', on_delete=models.deletion.CASCADE)
+    channel_name = models.CharField(max_length=125)
+    username = models.CharField(max_length=25, unique=True, null=True)
 
     @staticmethod
-    def create(username, rows, cols):
-        board = Board.create(rows, cols)
-        return Player.objects.create(username=username, board=board)
+    def create(channel_name):
+        return Player.objects.create(channel_name=channel_name)
 
 
 class Board(models.Model):
+    player = models.OneToOneField(Player, on_delete=models.deletion.CASCADE)
+
     MAX_SIZE = 20
     MIN_SIZE = 5
 
@@ -43,10 +44,10 @@ class Board(models.Model):
             return False
 
     @staticmethod
-    def create(rows, cols):
+    def create(player, rows, cols):
         board = np.zeros((rows, cols), dtype=np.int8)
         shots = np.zeros((rows, cols), dtype=np.int8)
-        return Board.objects.create(board=board, shots=shots)
+        return Board.objects.create(player=player, board=board, shots=shots)
 
     @staticmethod
     def get_number_of_ships_per_player(rows, cols):
@@ -149,12 +150,12 @@ class Game(models.Model):
                                 related_name="playerB", null=True, blank=True)
 
     @staticmethod
-    def create(username, rows, cols):
-        player = Player.create(username, rows, cols)
+    def create(player, rows, cols):
+        _ = Board.create(player, rows, cols)
         return Game.objects.create(rows=rows, cols=cols, playerA=player, current=player)
 
-    def join(self, username):
-        player = Player.create(username, self.rows, self.cols)
+    def join(self, player):
+        _ = Board.create(player, self.rows, self.cols)
         self.playerB = player
         self.save(update_fields=['playerB'])
 
