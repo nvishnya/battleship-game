@@ -10,6 +10,7 @@ import numpy as np
 class Player(models.Model):
     channel_name = models.CharField(max_length=125)
     username = models.CharField(max_length=25, unique=True, null=True)
+#     busy = models.BooleanField(default=False)
 
     @staticmethod
     def create(channel_name):
@@ -101,9 +102,9 @@ class Board(models.Model):
     def all_ships_are_shot(self):
         return self.ships_alive == 0
 
-    def add_ships_to_db(self, *xyships):
+    def add_ships_to_db(self, *ships):
         present_ids = list(Ship.objects.filter(board=self).values_list('id', flat=True))
-        Ship.objects.bulk_create([Ship(board=self, **xyship) for xyship in xyships])
+        Ship.objects.bulk_create([Ship(board=self, **ship) for ship in ships])
         new_ships = Ship.objects.filter(board=self).exclude(id__in=present_ids)
 
         Ship.add_coordinates(*new_ships)
@@ -114,12 +115,14 @@ class Board(models.Model):
             self.board[ship.indicies] = ship.length
         self.save(update_fields=['board'])
 
-    def place_ships(self, *xyships):
-        for xyship in xyships:
-            if not Board.is_placement_possible(self.board, **xyship):
+    def place_ships(self, *ships):
+        ships = [{k: v for k, v in ship.items() if k not in ['length', 'orientation']}
+                 for ship in ships]
+        for ship in ships:
+            if not Board.is_placement_possible(self.board, **ship):
                 return False  # could not place one of the ships; discard all
 
-        ships = self.add_ships_to_db(*xyships)
+        ships = self.add_ships_to_db(*ships)
         self.add_ships_on_board(ships)
         return True  # all ships were placed successfully
 
@@ -193,7 +196,7 @@ class Ship(models.Model):
 
     @property
     def length(self):
-        return np.maximum(self.rows, self.cols)
+        return int(np.maximum(self.rows, self.cols))
 
     @property
     def parts_left(self):
