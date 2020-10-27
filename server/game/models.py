@@ -10,11 +10,35 @@ import numpy as np
 class Player(models.Model):
     channel_name = models.CharField(max_length=125)
     username = models.CharField(max_length=25, unique=True, null=True)
-#     busy = models.BooleanField(default=False)
+    is_busy = models.BooleanField(default=False)
 
     @staticmethod
     def create(channel_name):
         return Player.objects.create(channel_name=channel_name)
+
+    @staticmethod
+    def update_players_statuses(*players):
+        for player in players:
+            if player is None:
+                continue
+            player.set_busy()
+
+    @staticmethod
+    def get_random_available_player(player):
+        available = Player.objects.filter(is_busy=False, board__isnull=False).exclude(id=player.id)
+        if available.count() == 0:
+            return None
+        else:
+            index = np.random.randint(0, available.count())
+            return available[index]
+
+    def set_busy(self):
+        self.is_busy = True
+        self.save(update_fields=['is_busy'])
+
+    def create_board_and_place_ships(self, rows, cols, ships):
+        board = Board.create(self, rows, cols)
+        return board.place_ships(*ships)
 
 
 class Board(models.Model):
@@ -137,6 +161,9 @@ class Board(models.Model):
             new_array[Ship._get_indicies(ship)] = array[Ship._get_indicies(ship)]
         return new_array
 
+    def is_already_shot(self, x, y):
+        return self.shots[x, y] > 0
+
 
 class Game(models.Model):
     rows = models.IntegerField(validators=[MinValueValidator(
@@ -147,36 +174,53 @@ class Game(models.Model):
     is_over = models.BooleanField(default=False)
     winner = models.ForeignKey('Player', on_delete=models.deletion.CASCADE,
                                related_name="winner", null=True, blank=True)
-    current = models.ForeignKey('Player', on_delete=models.deletion.CASCADE, related_name="current")
-    playerA = models.ForeignKey('Player', on_delete=models.deletion.CASCADE, related_name="playerA")
+    current = models.ForeignKey('Player', on_delete=models.deletion.CASCADE,
+                                related_name="current", null=True, blank=True)
+    playerA = models.ForeignKey('Player', on_delete=models.deletion.CASCADE,
+                                related_name="playerA", null=True, blank=True)
     playerB = models.ForeignKey('Player', on_delete=models.deletion.CASCADE,
                                 related_name="playerB", null=True, blank=True)
 
     @staticmethod
-    def create(player, rows, cols):
-        _ = Board.create(player, rows, cols)
-        return Game.objects.create(rows=rows, cols=cols, playerA=player, current=player)
+    def create(rows, cols, playerA=None, playerB=None):
+        game = Game.objects.create(rows=rows,
+                                   cols=cols,
+                                   playerA=playerA,
+                                   playerB=playerB,
+                                   current=playerA)
 
-    def join(self, player):
-        _ = Board.create(player, self.rows, self.cols)
-        self.playerB = player
-        self.save(update_fields=['playerB'])
+        Player.update_players_statuses(playerA, playerB)
+        return game
+
+    def add_player_to_game(self, player):
+        if self.playerA is None:
+            self.playerA = player
+        elif self.playerB is None:
+            self.playerB = player
+        else:
+            return False
+
+        self.save(update_fields=['playerA', 'playerB'])
+        Player.update_players_statuses(player)
+        return True
 
     def next_player(self):
         self.current = self.playerA if self.current != self.playerA else self.playerB
         self.save(force_update=True)
 
+# x, y boundaries
     def shoot(self, player, x, y):
-        if player != self.current:
-            return
         opponent = self.playerA if self.current == self.playerB else self.playerB
+        if player != self.current or opponent.board.is_already_shot(x, y):
+            return
         hit = opponent.board.shoot(x, y)
         if hit:
             self.is_over = True if opponent.board.ships_alive == 0 else False
-            self.winner = self.current
+            self.winner = self.current if self.is_over else None
             self.save(update_fields=['is_over', 'winner'])
         else:
             self.next_player()
+#         return hit
 
 
 class Ship(models.Model):

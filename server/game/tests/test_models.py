@@ -122,6 +122,13 @@ def test_board_shoot(db, board10x10):
     assert Coordinate.objects.get(x=0, y=0, ship__board=board10x10).is_hit
 
 
+def test_board_is_already_shot(db, board10x10):
+    assert not board10x10.is_already_shot(1, 1)
+    board10x10.shots[1, 1] = 1
+    board10x10.save()
+    assert board10x10.is_already_shot(1, 1)
+
+
 @pytest.mark.parametrize("rows, cols, expected", [
     (10, 10, 4),
     (10, 15, 4),
@@ -180,27 +187,21 @@ def test_ship_generate_random_ship(db):
 
 @pytest.fixture
 def game_factory(db):
-    def create_game(player, rows, cols):
-        return Game.create(player, rows, cols)
+    def create_game(rows, cols, playerA=None, playerB=None):
+        return Game.create(rows, cols, playerA, playerB)
     return create_game
 
 
 @pytest.fixture
-def gameA(db, player_factory, game_factory):
-    return game_factory(player_factory('playerA'), 10, 10)
+def gameAB(db, game_factory, board_factory, player_factory):
+    playerA = board_factory(player_factory('channelA')).player
+    playerB = board_factory(player_factory('channelB')).player
+    return game_factory(10, 10, playerA, playerB)
 
 
 @pytest.fixture
-def gameAB(db, game_factory, player_factory):
-    game = game_factory(player_factory('channelA'), 10, 10)
-    game.join(player_factory('channelB'))
-    return game
-
-
-def test_game_join_game(db, player_factory, gameA):
-    player = player_factory('channel')
-    gameA.join(player)
-    assert gameA.playerB == player
+def game(db, game_factory):
+    return game_factory(10, 10)
 
 
 def test_game_next_player(db, gameAB):
@@ -208,6 +209,13 @@ def test_game_next_player(db, gameAB):
     gameAB.next_player()
     assert gameAB.current == gameAB.playerB
 
+
+def test_game_add_player_to_game(db, game, playerA, playerB, playerC):
+    assert game.add_player_to_game(playerA)
+    assert game.playerA.id == playerA.id
+    assert game.add_player_to_game(playerB)
+    assert game.playerB.id == playerB.id
+    assert not game.add_player_to_game(playerC)
 
 def test_game_shoot(db, gameAB):
     gameAB.playerB.board.place_ships(ship1x1_at0x0_data)
@@ -220,3 +228,44 @@ def test_game_shoot(db, gameAB):
     assert gameAB.current == gameAB.playerB
     gameAB.shoot(gameAB.playerB, 0, 0)
     assert gameAB.current == gameAB.playerB
+    assert gameAB.is_over
+    assert gameAB.winner is gameAB.playerB
+
+
+# player
+
+@pytest.fixture
+def playerA(db, board_factory, player_factory):
+    board = board_factory(player_factory(channel='a'))
+    return board.player
+
+
+@pytest.fixture
+def playerB(db, board_factory, player_factory):
+    board = board_factory(player_factory(channel='b'))
+    return board.player
+
+
+@pytest.fixture
+def playerC(db, player_factory):
+    return player_factory(channel='c')
+
+
+def test_player_get_random_available_player(db, playerA, playerB):
+    assert Player.get_random_available_player(playerA).id is playerB.id
+    assert Player.get_random_available_player(playerB).id is playerA.id
+    playerB.set_busy()
+    assert Player.get_random_available_player(playerA) is None
+
+
+def test_player_create_board_and_place_ships(db, playerC):
+    playerC.create_board_and_place_ships(10, 10, [ship1x3_at4x4_data])
+    assert Board.objects.all().count() == 1
+    assert Ship.objects.all().count() == 1
+    assert Coordinate.objects.count() == 3
+
+
+def test_player_update_player_statuses(db, playerA, ):
+    assert not playerA.is_busy
+    Player.update_players_statuses(playerA, None)
+    assert playerA.is_busy
