@@ -29,6 +29,11 @@ class Board(models.Model):
     board = PickledObjectField()
     shots = PickledObjectField()
 
+    @property
+    def shots_with_marked(self):
+        data = [model_to_dict(ship) for ship in self.ship_set.all() if not ship.is_alive]
+        return Board._mark_surrounding_cells(self.shots, *data)
+
     def shoot(self, x, y):
         if self.board[x, y] > 0:
             self.shots[x, y] = Board.HIT
@@ -36,8 +41,6 @@ class Board(models.Model):
             coordinate = Coordinate.objects.get(x=x, y=y, ship__board=self)
             coordinate.hit()
             self.save(update_fields=['shots', 'board'])
-            if not coordinate.ship.is_alive:
-                self.mark_surrounding_cells(coordinate.ship)
             return True
         else:
             self.shots[x, y] = Board.MISS
@@ -126,15 +129,12 @@ class Board(models.Model):
         self.add_ships_on_board(ships)
         return True  # all ships were placed successfully
 
-    def mark_surrounding_cells(self, ship):
-        self.shots = Board._mark_surrounding_cells(self.shots, model_to_dict(ship))
-        self.save(update_fields=['shots'])
-
     @staticmethod
-    def _mark_surrounding_cells(array, data):
+    def _mark_surrounding_cells(array, *data):
         new_array = array.copy()
-        new_array[Ship._get_indicies(data, offset=True)] = Board.MISS
-        new_array[Ship._get_indicies(data)] = array[Ship._get_indicies(data)]
+        for ship in data:
+            new_array[Ship._get_indicies(ship, offset=True)] = Board.MISS
+            new_array[Ship._get_indicies(ship)] = array[Ship._get_indicies(ship)]
         return new_array
 
 

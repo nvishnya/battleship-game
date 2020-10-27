@@ -96,9 +96,17 @@ def test_board_all_ships_are_shot(db, board10x10):
 def test_board_mark_surrounding_cells(db, board10x10):
     board10x10.place_ships(ship1x1_at0x0_data)
     ship = board10x10.ship_set.all()[0]
-    board10x10.mark_surrounding_cells(ship)
-    around = board10x10.shots[Ship._get_indicies(model_to_dict(ship), offset=True)]
-    assert around[around > 0].size == 3
+    marked = Board._mark_surrounding_cells(board10x10.shots, model_to_dict(ship))
+    assert marked[marked == Board.MISS].size == 3
+
+
+def test_board_shots_with_marked(db, board10x10):
+    #     marks surrounding cells only for sunken ships
+    board10x10.place_ships(ship1x3_at4x4_data)
+    ship = board10x10.ship_set.all()[0]
+    assert board10x10.shots_with_marked[board10x10.shots_with_marked == Board.MISS].size == 0
+    ship.coordinate_set.all().update(is_hit=True)
+    assert board10x10.shots_with_marked[board10x10.shots_with_marked == Board.MISS].size == 12
 
 
 def test_board_place_ships(db, board10x10):
