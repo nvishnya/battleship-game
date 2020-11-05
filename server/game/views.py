@@ -13,7 +13,10 @@ def get_random_board(request):
     data = map(lambda x: Ship(**x), ships)
     return Response(ShipSerializer(data, many=True).data)
 
-class GameView(RetrieveAPIView):
-    queryset = Game.objects.all()
-    serializer_class = GameSerializer
-#     permission_classes = [IsPlayerInGame]
+
+@api_view(['POST'])
+def new_game(request):
+    qp = TestQueryParams(data=request.data)
+    qp.is_valid(raise_exception=True)
+    game = Game.create(qp.data['rows'], qp.data['cols'])
+    return Response({"game_id": game.id})

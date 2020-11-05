@@ -1,7 +1,7 @@
 from django.urls.conf import path
-from game.views import get_random_board, GameView
+from game.views import get_random_board, new_game
 
 urlpatterns = [
     path('random-board/', get_random_board),
-    path('game/<int:pk>/', GameView.as_view())
+    path('new-game/', new_game)
 ]
