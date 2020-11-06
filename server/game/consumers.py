@@ -21,7 +21,8 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):
-        await self.leave()
+        if self.game_id is not None:
+            await self.leave()
 
     async def receive_json(self, content):
         command = content.get('command', None)
