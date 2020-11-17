@@ -2,51 +2,73 @@ import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
 import router from "@/router";
-import { getSocketUrl } from "@/helpers.js";
-import { codePointAt } from "core-js/fn/string";
+// import { getSocketUrl } from "@/helpers.js";
+import { getSocketUrl } from "../helpers";
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    socket: null
+    socket: null,
+    savedGameId: null,
+    // gameData: null, ?
   },
   mutations: {
     closeSocket(state) {
-      state.socket.close();
+      if (state.socket != null) {
+        state.socket.close();
+      }
     },
     changeSocketURL(state, gameId) {
-      let url = getSocketUrl(gameId);
-      state.socket = new WebSocket(url);
+      state.socket = new WebSocket(getSocketUrl(gameId));
+    },
+    addListeners(state, handler) {
+      state.socket.onmessage = handler;
+    },
+    saveGameId(state, gameId) {
+      state.savedGameId = gameId;
     }
   },
   actions: {
-    initSocket({ commit }) {
-      
+    initSocket({ commit }, payload) {
       let gameId = router.currentRoute.params.id;
+      commit("closeSocket");
       commit("changeSocketURL", gameId);
+      if (payload != undefined && payload.handler != undefined) {
+        commit("addListeners", payload.handler);
+      }
     },
 
-    async createGameWithFriend({ commit }, payload) {
-      const response = await axios.post("new-game/", {
-        rows: payload.rows,
-        cols: payload.cols
-      });
-      let gameId = response.data.game_id;
+    async createGameWithFriendOpponent({ dispatch, commit, state }, payload) {
+      let gameId = state.savedGameId;
+      if (state.savedGameId == null) {
+        const response = await axios.post("new-game/", {
+          rows: payload.rows,
+          cols: payload.cols
+        });
+        gameId = response.data.game_id;
+        commit("saveGameId", gameId);
+      }
       router.push({ name: "Game", params: { id: gameId } });
-      commit("closeSocket")
-      commit("changeSocketURL", gameId);
-
+      dispatch("initSocket");
       // send start command to ws ?
     },
 
-    startGame() {
-
+    createGameWithRandomOpponent({ dispatch }) {
+      router.push({ name: "Game" });
+      dispatch("initSocket");
     },
-    makeMove() {
 
+    sendSocketMessage({ state }, payload) {
+      state.socket.send(JSON.stringify(payload));
     }
 
+    // async getRandomlyPositionedShips(_, payload) {
+    //   const response = await axios.get(
+    //     `random-board/?rows=${payload.rows}&cols=${payload.cols}`
+    //   );
+    //   return response.data;
+    // }
   },
   modules: {}
 });
