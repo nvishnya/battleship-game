@@ -15,7 +15,8 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             await self.channel_layer.group_add(group_name, player.channel_name)
 
     async def connect(self):
-        self.player = await create_player(self.channel_name)
+        player = await create_player(self.channel_name)
+        self.player_id = player.id
         self.game_id = self.scope['url_route']['kwargs'].get('game_id', None)
         self.group_name = self.get_group_name(self.game_id)
         await self.accept()
@@ -44,10 +45,10 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             self.group_name,
             self.channel_name,
         )
-        await delete_player(self.player)
+        await delete_player(self.player_id)
 
     async def start(self, rows, cols, ships):
-        await place_ships(self.player, rows, cols, ships)
+        await place_ships(self.player_id, rows, cols, ships)
         self.rows, self.cols = rows, cols
         if self.game_id is None:
             await self.random_opponent()
@@ -55,11 +56,11 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             await self.friend_opponent()
 
     async def random_opponent(self):
-        opponent = await get_random_available_player(self.player)
+        opponent = await get_random_available_player(self.player_id)
         if opponent is None:
-            await self.send_json({'event': 'waiting-for-opponent'})
+            await self.send_json({'type': 'waiting-for-opponent'})
             return
-        game = await create_game(self.rows, self.cols, self.player, opponent)
+        game = await create_game(self.rows, self.cols, self.player_id, opponent.id)
 
         self.game_id = game.id
         self.group_name = self.get_group_name(self.game_id)
@@ -76,8 +77,8 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
 
     async def friend_opponent(self):
         game = await get_game_or_error(self.game_id)
-        await add_player_to_game(game, self.player)
-        
+        await add_player_to_game(game, self.player_id)
+
 #         if status is False:
 #             await self.send_json({'event': 'game-already-started'})
 #             return
@@ -86,7 +87,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         game = await get_game_or_error(self.game_id)
 
         if game.playerB_id is None:
-            await self.send_json({'event': 'waiting-for-friend'})
+            await self.send_json({'type': 'waiting-for-opponent'})
         else:
             await self.channel_layer.group_send(
                 self.group_name,
@@ -98,7 +99,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             )
 
     async def move(self, x, y):
-        await game_shoot(self.game_id, self.player, x, y)
+        await game_shoot(self.game_id, self.player_id, x, y)
         await self.channel_layer.group_send(
             self.group_name,
             {
@@ -108,10 +109,10 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
 # Handlers for messages sent over the channel layer
 
     async def game_update(self, event):
-        data = await get_game_data(self.game_id, self.player)
+        data = await get_game_data(self.game_id, self.player_id)
         await self.send_json(
             {
-                "event": event["type"],
+                "type": event["type"],
                 "game": data
             },
         )
@@ -119,12 +120,12 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
     async def game_start(self, event):
         self.game_id = event["game_id"]
         self.group_name = event["group_name"]
-        
-        data = await get_game_data(self.game_id, self.player)
+
+        data = await get_game_data(self.game_id, self.player_id)
 
         await self.send_json(
             {
-                "event": event["type"],
+                "type": event["type"],
                 "game": data
             },
         )
@@ -132,7 +133,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
     async def opponent_left(self, event):
         await self.send_json(
             {
-                "event": event["type"],
+                "type": event["type"],
             },
         )
         self.leave()
