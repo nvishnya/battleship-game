@@ -45,17 +45,17 @@ class OpponentSerializer(serializers.ModelSerializer):
 
 
 class GameSerializer(serializers.ModelSerializer):
-    current = serializers.SerializerMethodField()
+    your_turn = serializers.SerializerMethodField()
     you = serializers.SerializerMethodField()
     opponent = serializers.SerializerMethodField()
 
     class Meta:
         model = Game
-        fields = ['rows', 'cols', 'current', 'you', 'opponent']
+        fields = ['rows', 'cols', 'your_turn', 'you', 'opponent']
 
-    def get_current(self, obj):
+    def get_your_turn(self, obj):
         player = self._context.get("player")
-        return 'you' if obj.current == player else 'opponent'
+        return True if obj.current == player else False
 
     def get_you(self, obj):
         player = self._context.get("player")
