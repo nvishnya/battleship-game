@@ -1,0 +1,93 @@
+.game {
+    text-align: center;
+}
+// header
+#app-title {
+    text-align: center;
+    letter-spacing: 0.2em;
+}
+// board
+$ship-color: rgba(140, 0, 255, 0.226);
+$shot-miss-size: 5px;
+.ship-part {
+    background-color: $ship-color;
+    height: inherit;
+    width: inherit;
+}
+.shot-miss {
+    background-color: blue;
+    width: $shot-miss-size;
+    height: $shot-miss-size;
+    border-radius: 50%;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.shot-hit {
+    width: inherit;
+    height: inherit;
+    // background-color: red !important;
+    background: linear-gradient(
+            to top left,
+            $ship-color 0%,
+            $ship-color calc(50% - 0.8px),
+            rgb(255, 0, 0) 50%,
+            $ship-color calc(50% + 0.8px),
+            $ship-color 100%
+        ),
+        linear-gradient(
+            to top right,
+            rgba(0, 0, 0, 0) 0%,
+            rgba(0, 0, 0, 0) calc(50% - 0.8px),
+            rgb(255, 0, 0) 50%,
+            rgba(0, 0, 0, 0) calc(50% + 0.8px),
+            rgba(0, 0, 0, 0) 100%
+        );
+    border: 1px red;
+}
+// place
+$cell-size: 35px;
+$cell-border: 1px;
+$ship-color: rgba(140, 0, 255, 0.226);
+$orientations: "HR", "VR";
+
+@for $length from 1 through 5 {
+    @each $orientation in $orientations {
+        .ship-#{$orientation}-#{$length} {
+            z-index: 2;
+            position: absolute;
+
+            $lw: if($orientation== "HR", $length, 1);
+            $lh: if($orientation== "VR", $length, 1);
+
+            width: $cell-size * $lw + $cell-border * $lw;
+            height: $cell-size * $lh + $cell-border * $lh;
+            background: $ship-color;
+        }
+    }
+}
+.board {
+    width: 10 * $cell-size + 11 * $cell-border;
+    height: 10 * $cell-size + 11 * $cell-border;
+    margin: 21px;
+    display: inline-block;
+}
+.board-table {
+    user-select: none; //TODO use different properties for different browsers
+    border-collapse: collapse;
+    padding: 0;
+    // margin-top: ;
+}
+.board-cell-content {
+    width: $cell-size;
+    height: $cell-size;
+    // background-color: indigo;
+}
+.board-cell {
+    border: $cell-border solid grey;
+    padding: 0;
+}
+#app {
+    margin: 0 auto;
+}
