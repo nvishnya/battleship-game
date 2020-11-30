@@ -1,145 +1,115 @@
 <template>
-  <div v-if="field" class="field">
-    <table class="field-table">
-      <tbody>
-        <tr v-for="(_, row) in rows" :key="row">
-          <td v-for="(_, col) in cols" :key="col" class="field-cell">
-            <div
-              @drop="onDrop($event, row, col)"
-              @dragenter.prevent
-              @dragover.prevent
-              class="field-cell-content"
-            >
-              &nbsp;
+  <div>
+    <div v-if="board" class="board">
+      <table class="board-table">
+        <tbody>
+          <tr v-for="(_, row) in rows" :key="row">
+            <td v-for="(_, col) in cols" :key="col" class="board-cell">
               <div
-                v-if="field[row][col] != -1"
-                draggable="true"
-                @dragstart="startDrag($event, field[row][col])"
-                :class="[
-                  getShipClassName(
-                    ships[field[row][col]]['length'],
-                    ships[field[row][col]]['orientation']
-                  ),
-                ]"
-              ></div>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+                class="board-cell-content"
+                @drop="onDrop($event, row, col)"
+                @dragenter.prevent
+                @dragover.prevent
+              >
+                &nbsp;
+                <div
+                  v-if="board[row][col] != -1"
+                  :class="[
+                    getShipClassName(
+                      ships[board[row][col]]['length'],
+                      ships[board[row][col]]['orientation']
+                    ),
+                  ]"
+                  draggable="true"
+                  @dragstart="onDragStart($event, board[row][col])"
+                  @dblclick="rotate($event, board[row][col])"
+                ></div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- <div class="clues">
+      * double click to rotate * drag and drop to move
+    </div> -->
+    <div>
+      <button class="btn" @click="randomizeShips">randomize</button>
+    </div>
   </div>
 </template>
 
 <script>
-import { zeros } from "../helpers";
+import { mapActions, mapState } from "vuex";
+import { isPlacementPossible, placeShips, zeros } from "../helpers";
 export default {
-  data() {
-    return {
-      // disable drag-n-drop if ships has been placed
-      // placed: false,
-      ships: [],
-    };
-  },
   props: {
     rows: Number,
     cols: Number,
   },
-  created() {
-    this.getRandomlyPositionedShips();
-  },
   computed: {
-    field() {
-      console.log("update");
-      let field = zeros(this.rows, this.cols);
+    ...mapState(["ships"]),
+    board() {
+      let board = zeros(this.rows, this.cols, -1);
       for (let i = 0; i < this.ships.length; i++) {
-        field[this.ships[i].x][this.ships[i].y] = i;
+        board[this.ships[i].x][this.ships[i].y] = i;
       }
-      return field;
+      return board;
     },
   },
   methods: {
+    ...mapActions(["randomizeShips"]),
     getShipClassName(length, orientation) {
       return `ship-${orientation}-${length}`;
     },
-    async getRandomlyPositionedShips() {
-      const response = await this.axios.get(
-        `random-board/?rows=${this.rows}&cols=${this.cols}`
-      );
-      this.ships = response.data;
+    onDragStart(event, shipIndex) {
+      event.dataTransfer.dropEffect = "move";
+      event.dataTransfer.effectAllowed = "move";
+
+      let size = event.path[2].clientWidth; // + clientTop / + clientLeft
+
+      let offsetRow = Math.floor(event.offsetY / size);
+      let offsetCol = Math.floor(event.offsetX / size);
+
+      event.dataTransfer.setData("shipIndex", shipIndex);
+      event.dataTransfer.setData("offsetRow", offsetRow);
+      event.dataTransfer.setData("offsetCol", offsetCol);
     },
-    startDrag(evt, index) {
-      var rect = evt.path[1].getBoundingClientRect();
-      var docEl = document.documentElement;
+    onDrop(event, x, y) {
+      let shipIndex = event.dataTransfer.getData("shipIndex");
+      let offsetX = parseInt(event.dataTransfer.getData("offsetRow"));
+      let offsetY = parseInt(event.dataTransfer.getData("offsetCol"));
 
-      var rectTop = rect.top + window.pageYOffset - docEl.clientTop;
-      var rectLeft = rect.left + window.pageXOffset - docEl.clientLeft;
+      let newX = x - offsetX;
+      let newY = y - offsetY;
 
-      let width = evt.path[1].clientWidth;
-      let height = evt.path[1].clientHeight;
+      let ship = JSON.parse(JSON.stringify(this.ships[shipIndex]));
+      ship.x = newX;
+      ship.y = newY;
 
-      let offset_col = (evt.clientX - rectLeft) / width;
-      let offset_row = (evt.clientY - rectTop) / height;
-
-      evt.dataTransfer.dropEffect = "move";
-      evt.dataTransfer.effectAllowed = "move";
-
-      evt.dataTransfer.setData("index", index);
-      evt.dataTransfer.setData("offset_row", Math.floor(offset_row));
-      evt.dataTransfer.setData("offset_col", Math.floor(offset_col));
+      let tempShips = this.ships.filter(function (_, index) {
+        return index != shipIndex;
+      });
+      let currentBoard = placeShips(this.rows, this.cols, tempShips);
+      if (isPlacementPossible(currentBoard, ship, this.rows, this.cols)) {
+        this.$set(this.ships, shipIndex, ship);
+      }
     },
-    onDrop(evt, row, col) {
-      console.log(evt);
-      let index = evt.dataTransfer.getData("index");
-      let offset_row = parseInt(evt.dataTransfer.getData("offset_row"));
-      let offset_col = parseInt(evt.dataTransfer.getData("offset_col"));
+    rotate(event, shipIndex) {
+      let ship = JSON.parse(JSON.stringify(this.ships[shipIndex]));
+      ship.rows = this.ships[shipIndex].cols;
+      ship.cols = this.ships[shipIndex].rows;
+      ship.orientation =
+        this.ships[shipIndex].orientation == "HR" ? "VR" : "HR";
 
-      // check if placement's possible
-
-      let newShipData = this.ships[index];
-      newShipData.x = row - offset_row;
-      newShipData.y = col - offset_col;
-
-      this.$set(this.ships, index, newShipData);
+      let tempShips = this.ships.filter(function (_, index) {
+        return index != shipIndex;
+      });
+      let currentBoard = placeShips(this.rows, this.cols, tempShips);
+      if (isPlacementPossible(currentBoard, ship, this.rows, this.cols)) {
+        this.$set(this.ships, shipIndex, ship);
+      }
     },
   },
 };
 </script>
-
-
-<style lang="scss">
-// $base-color: #036;
-$cell-size: 30px;
-$cell-border: 1px;
-
-$orientations: "HR", "VR";
-
-@for $length from 1 through 5 {
-  @each $orientation in $orientations {
-    .ship-#{$orientation}-#{$length} {
-      z-index: 2;
-      position: absolute;
-
-      $lw: if($orientation== "HR", $length, 1);
-      $lh: if($orientation== "VR", $length, 1);
-
-      width: $cell-size * $lw + $cell-border * $lw;
-      height: $cell-size * $lh + $cell-border * $lh;
-      background: rgba(140, 0, 255, 0.226);
-    }
-  }
-}
-.field-table {
-  user-select: none; //TODO use different properties for different browsers
-  border-collapse: collapse;
-  padding: 0;
-}
-.field-cell-content {
-  width: $cell-size;
-  height: $cell-size;
-  // background-color: indigo;
-}
-.field-cell {
-  border: $cell-border solid grey;
-  padding: 0;
-}
-</style>
