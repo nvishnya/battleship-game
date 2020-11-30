@@ -1,77 +1,96 @@
 <template>
-  <div>
-    <ShipPlacement :rows="size.rows" :cols="size.cols" />
-    <!-- <button @click="createGameWithFriendOpponent(size)">
-      Game With Friend
-    </button>
-    <button @click="createGameWithRandomOpponent">
-      Game With Random
-    </button>
-    <button @click="startGame">
-      Start Game
-    </button> -->
-    <!-- <button @click="getRandomlyPositionedShips">Randomize</button> -->
+  <div class="game">
+    <!-- GAME NOT STARTED YET -->
+    <template v-if="!shipsPlaced">
+      <ShipPlacement :rows="rows" :cols="cols" />
+      <div class="opponent-select">
+        opponent:
+        <span>friend</span>/random
+      </div>
+      <div>
+        <button class="btn" @click="startGame">start</button>
+      </div>
+    </template>
+
+    <div v-if="friendAsOpponent && shipsPlaced && !gameStarted">
+      send this link to your frined:
+    </div>
+
+    <template v-if="gameStarted">
+      <Status :yourTurn="yourTurn" />
+      <!-- YOU -->
+      <Board
+        :rows="rows"
+        :cols="cols"
+        :board="board"
+        :shots="shots"
+        :yours="true"
+      />
+      <Board
+        :rows="rows"
+        :cols="cols"
+        :board="dummyBoard"
+        :shots="opponent"
+        :yours="false"
+      />
+    </template>
   </div>
 </template>
 
 <script>
 import { mapActions, mapState } from "vuex";
+import { zeros } from "../helpers";
 import ShipPlacement from "@/components/ShipPlacement.vue";
+import Status from "@/components/Status.vue";
+import Board from "@/components/Board.vue";
 
 export default {
   components: {
     ShipPlacement,
+    Status,
+    Board,
   },
   data() {
     return {
-      // custom size for a game with a friend only!
-      loading: false,
-
-      size: { rows: 10, cols: 10 },
-      ships: [],
-
-      field: null,
-      shots: null,
+      dummyBoard: [],
     };
   },
   computed: {
-    ...mapState(["socket"]),
+    ...mapState([
+      "socket",
+      "savedGameId",
+      "friendAsOpponent",
+      "rows",
+      "cols",
+      "ships",
+
+      "board",
+      "shots",
+      "opponent",
+      "yourTurn",
+
+      "shipsPlaced",
+      "gameStarted",
+    ]),
   },
   created() {
-    this.$store.dispatch("initSocket", { handler: this.onGameUpdate });
+    this.dummyBoard = zeros(this.rows, this.cols, 0);
+    this.$store.dispatch("initSocket", {
+      handler: this.onGameUpdate,
+      reloadShips: true,
+    });
   },
   methods: {
     ...mapActions([
       "createGameWithFriendOpponent",
       "createGameWithRandomOpponent",
-      "sendSocketMessage",
+      "onSocketMessage",
+      "updateGame",
+      "startGame",
     ]),
     onGameUpdate(event) {
-      console.log("it works!: ", event);
-    },
-    async getRandomlyPositionedShips() {
-      const response = await this.axios.get(
-        `random-board/?rows=${this.size.rows}&cols=${this.size.cols}`
-      );
-      this.ships = response.data;
-    },
-
-    startGame() {
-      let payload = {
-        command: "start",
-        ships: this.ships,
-        ...this.size,
-      };
-      this.sendSocketMessage(payload);
-    },
-
-    makeMove(x, y) {
-      let payload = {
-        command: "move",
-        x: x,
-        y: y,
-      };
-      this.sendSocketMessage(payload);
+      let data = JSON.parse(event.data);
+      this.onSocketMessage(data);
     },
   },
 };
