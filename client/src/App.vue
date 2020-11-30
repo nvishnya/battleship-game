@@ -1,13 +1,12 @@
 <template>
   <div id="app">
+    <div id="app-title">battleship.</div>
     <router-view />
   </div>
 </template>
 
-<script>
-export default {
-  created() {
-    // this.$store.dispatch("initSocket");
-  },
-};
-</script>
+<style lang="scss">
+#id {
+  background-color: transparent;
+}
+</style>
