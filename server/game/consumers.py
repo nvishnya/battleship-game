@@ -15,8 +15,8 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             await self.channel_layer.group_add(group_name, player.channel_name)
 
     async def connect(self):
-        player = await create_player(self.channel_name)
-        self.player_id = player.id
+        self.player = await create_player(self.channel_name)
+        self.player_id = self.player.id
         self.game_id = self.scope['url_route']['kwargs'].get('game_id', None)
         self.group_name = self.get_group_name(self.game_id)
         await self.accept()
