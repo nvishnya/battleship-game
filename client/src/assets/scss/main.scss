@@ -1,13 +1,13 @@
-.game {
-    text-align: center;
-}
+$margin-size: 21px;
 // header
 #app-title {
-    text-align: center;
-    letter-spacing: 0.2em;
+    margin-top: $margin-size;
+    // text-align: center;
+    // letter-spacing: 0.2em;
 }
 // board
-$ship-color: rgba(140, 0, 255, 0.226);
+// $ship-color: rgba(140, 0, 255, 0.226);
+$ship-color: rgba(0, 0, 0, 0.226);
 $shot-miss-size: 5px;
 .ship-part {
     background-color: $ship-color;
@@ -44,12 +44,13 @@ $shot-miss-size: 5px;
             rgba(0, 0, 0, 0) calc(50% + 0.8px),
             rgba(0, 0, 0, 0) 100%
         );
-    border: 1px red;
+    // border: 1px red;
 }
+
 // place
 $cell-size: 35px;
 $cell-border: 1px;
-$ship-color: rgba(140, 0, 255, 0.226);
+// $ship-color: rgba(140, 0, 255, 0.226);
 $orientations: "HR", "VR";
 
 @for $length from 1 through 5 {
@@ -70,7 +71,7 @@ $orientations: "HR", "VR";
 .board {
     width: 10 * $cell-size + 11 * $cell-border;
     height: 10 * $cell-size + 11 * $cell-border;
-    margin: 21px;
+    margin: $margin-size;
     display: inline-block;
 }
 .board-table {
@@ -88,6 +89,26 @@ $orientations: "HR", "VR";
     border: $cell-border solid grey;
     padding: 0;
 }
-#app {
-    margin: 0 auto;
+@import url("https://fonts.googleapis.com/css2?family=Special+Elite&display=swap");
+#app > * {
+    text-align: center;
+    font-family: "Special Elite", cursive;
 }
+.btn {
+    width: 100px;
+    padding: 2px;
+    font-family: "Special Elite", cursive;
+}
+.opponent-select {
+    margin: $margin-size;
+}
+.status-bar {
+    margin-top: $margin-size;
+}
+
+.clues > * {
+    margin: 10px;
+}
+// .clues {
+//     margin-top: 10px;
+// }
