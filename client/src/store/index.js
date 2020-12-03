@@ -3,7 +3,7 @@ import Vuex from "vuex";
 import axios from "axios";
 import router from "@/router";
 // import { getSocketUrl } from "@/helpers.js";
-import { getSocketUrl } from "../helpers";
+import { getSocketUrl, zeros } from "../helpers";
 
 Vue.use(Vuex);
 
@@ -143,11 +143,15 @@ export default new Vuex.Store({
       commit("updateOpponent", data.opponent.shots)
       commit("updateCurrentTurn", data.your_turn)
     },
-    onSocketMessage({ commit, dispatch }, data) {
+    onSocketMessage({ commit, dispatch, state }, data) {
       // console.log(commit)
       // console.log(data.type === 'game.start')
       if (data.type === "waiting-for-opponent") {
+        // console.log(data)
         commit("placeShips");
+        commit("updateBoard", data.you.board)
+        commit("updateShots", data.you.shots)
+        commit("updateOpponent", JSON.stringify(zeros(state.rows, state.cols, 0)))
         // console.log("place")
       }
       else if (data.type === "game.start") {

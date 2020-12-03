@@ -2,7 +2,7 @@ from channels.db import database_sync_to_async
 # from game.serializers import GameSerializer
 from game.models import Game, Player
 from twisted.protocols.memcache import ClientError
-from game.serializers import GameSerializer
+from game.serializers import GameSerializer, YouSerializer
 
 
 @database_sync_to_async
@@ -14,6 +14,10 @@ def create_player(channel_name):
 def delete_player(player_id):
     Player.objects.get(id=player_id).delete()
 
+@database_sync_to_async
+def get_player_data(player_id):
+    player = Player.objects.get(id=player_id)
+    return YouSerializer(player).data
 
 @database_sync_to_async
 def place_ships(player_id, rows, cols, ships):

@@ -1,7 +1,7 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from game.utils import create_player, delete_player, place_ships, create_game, \
     get_random_available_player, get_game_or_error, add_player_to_game, \
-    get_game_data, game_shoot
+    get_game_data, game_shoot, get_player_data
 
 
 class GameConsumer(AsyncJsonWebsocketConsumer):
@@ -58,7 +58,8 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
     async def random_opponent(self):
         opponent = await get_random_available_player(self.player_id)
         if opponent is None:
-            await self.send_json({'type': 'waiting-for-opponent'})
+            data = await get_player_data(self.player_id)
+            await self.send_json({'type': 'waiting-for-opponent', "you": data})
             return
         game = await create_game(self.rows, self.cols, self.player_id, opponent.id)
 
@@ -87,7 +88,8 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         game = await get_game_or_error(self.game_id)
 
         if game.playerB_id is None:
-            await self.send_json({'type': 'waiting-for-opponent'})
+            data = await get_player_data(self.player_id)
+            await self.send_json({'type': 'waiting-for-opponent', "you": data})
         else:
             await self.channel_layer.group_send(
                 self.group_name,
