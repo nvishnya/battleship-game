@@ -56,3 +56,20 @@ function isShipInRange(ship, maxX, maxY) {
   }
   return true
 }
+
+export function getOffset(event) {
+  let size = event.path[2].clientWidth; // + clientTop / + clientLeft
+  let offsetRow = Math.floor(event.offsetY / size);
+  let offsetCol = Math.floor(event.offsetX / size);
+  return [offsetRow, offsetCol]
+}
+
+export function getTempShipsAndNewShip(ships, shipIndex) {
+  let tempShips = _.cloneDeep(ships);
+  let ship = tempShips.splice(shipIndex, 1)[0];
+  return [tempShips, ship]
+}
+
+export function getNewOrientation(oldOrientation) {
+  return oldOrientation == "HR" ? "VR" : "HR";
+}

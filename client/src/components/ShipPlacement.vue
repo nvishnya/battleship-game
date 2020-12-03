@@ -41,7 +41,16 @@
 
 <script>
 import { mapActions, mapState } from "vuex";
-import { isPlacementPossible, placeShips, zeros } from "../helpers";
+import {
+  getNewOrientation,
+  getOffset,
+  getTempShipsAndNewShip,
+  isPlacementPossible,
+  placeShips,
+  zeros,
+} from "../helpers";
+var _ = require("lodash");
+
 export default {
   props: {
     rows: Number,
@@ -66,10 +75,10 @@ export default {
       event.dataTransfer.dropEffect = "move";
       event.dataTransfer.effectAllowed = "move";
 
-      let size = event.path[2].clientWidth; // + clientTop / + clientLeft
-
-      let offsetRow = Math.floor(event.offsetY / size);
-      let offsetCol = Math.floor(event.offsetX / size);
+      // let size = event.path[2].clientWidth; // + clientTop / + clientLeft
+      // let offsetRow = Math.floor(event.offsetY / size);
+      // let offsetCol = Math.floor(event.offsetX / size);
+      let [offsetRow, offsetCol] = getOffset(event);
 
       event.dataTransfer.setData("shipIndex", shipIndex);
       event.dataTransfer.setData("offsetRow", offsetRow);
@@ -77,34 +86,35 @@ export default {
     },
     onDrop(event, x, y) {
       let shipIndex = event.dataTransfer.getData("shipIndex");
-      let offsetX = parseInt(event.dataTransfer.getData("offsetRow"));
-      let offsetY = parseInt(event.dataTransfer.getData("offsetCol"));
+      let offsetRow = parseInt(event.dataTransfer.getData("offsetRow"));
+      let offsetCol = parseInt(event.dataTransfer.getData("offsetCol"));
 
-      let newX = x - offsetX;
-      let newY = y - offsetY;
+      let newX = x - offsetRow;
+      let newY = y - offsetCol;
 
-      let ship = JSON.parse(JSON.stringify(this.ships[shipIndex]));
+      let [tempShips, ship] = getTempShipsAndNewShip(this.ships, shipIndex);
       ship.x = newX;
       ship.y = newY;
 
-      let tempShips = this.ships.filter(function (_, index) {
-        return index != shipIndex;
-      });
       let currentBoard = placeShips(this.rows, this.cols, tempShips);
       if (isPlacementPossible(currentBoard, ship, this.rows, this.cols)) {
         this.$set(this.ships, shipIndex, ship);
       }
     },
     rotate(event, shipIndex) {
-      let ship = JSON.parse(JSON.stringify(this.ships[shipIndex]));
+      let [offsetRow, offsetCol] = getOffset(event);
+      let [tempShips, ship] = getTempShipsAndNewShip(this.ships, shipIndex);
+
       ship.rows = this.ships[shipIndex].cols;
       ship.cols = this.ships[shipIndex].rows;
-      ship.orientation =
-        this.ships[shipIndex].orientation == "HR" ? "VR" : "HR";
 
-      let tempShips = this.ships.filter(function (_, index) {
-        return index != shipIndex;
-      });
+      let clickedX = this.ships[shipIndex].x + offsetRow;
+      let clickedY = this.ships[shipIndex].y + offsetCol;
+
+      ship.x = clickedX - offsetCol;
+      ship.y = clickedY - offsetRow;
+      ship.orientation = getNewOrientation(this.ships[shipIndex].orientation);
+
       let currentBoard = placeShips(this.rows, this.cols, tempShips);
       if (isPlacementPossible(currentBoard, ship, this.rows, this.cols)) {
         this.$set(this.ships, shipIndex, ship);
