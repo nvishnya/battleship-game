@@ -1,14 +1,17 @@
 <template>
-  <div v-if="shots" :class="[yours ? 'you' : 'opponent', 'board']">
+  <div
+    v-if="shots"
+    :class="[waiting ? 'disabled' : '', , yours ? 'you' : 'opponent', 'board']"
+  >
     <div v-if="yours">your board</div>
     <div v-else>opponent's board</div>
-    <table class="board-table">
+    <table :class="['board-table']">
       <tbody>
         <tr v-for="(_, x) in rows" :key="x">
           <td v-for="(_, y) in cols" :key="y" class="board-cell">
             <div
               @click="
-                if (!yours && shots[x][y] == 0) {
+                if (!waiting && !yours && shots[x][y] == 0) {
                   makeMove({ x: x, y: y });
                 }
               "
@@ -41,6 +44,8 @@ export default {
     board: Array,
     shots: Array,
     yours: Boolean,
+
+    waiting: Boolean,
   },
   methods: {
     ...mapActions(["makeMove"]),
@@ -49,4 +54,3 @@ export default {
 </script>
 // :class="[ // getShipClassName( // ships[board[x][y]]['length'], //
 ships[board[x][y]]['orientation'] // ), // ]"
-

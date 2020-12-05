@@ -48,7 +48,7 @@ $shot-miss-size: 5px;
 }
 
 // place
-$cell-size: 35px;
+$cell-size: 41px;
 $cell-border: 1px;
 // $ship-color: rgba(140, 0, 255, 0.226);
 $orientations: "HR", "VR";
@@ -93,6 +93,7 @@ $orientations: "HR", "VR";
 #app > * {
     text-align: center;
     font-family: "Special Elite", cursive;
+    font-size: larger;
 }
 .btn {
     width: 100px;
@@ -108,6 +109,21 @@ $orientations: "HR", "VR";
 
 .clues > * {
     margin: 10px;
+}
+.disabled {
+    opacity: 0.25;
+}
+.green {
+    color: darkgreen;
+}
+.blinking {
+    animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
 }
 // .clues {
 //     margin-top: 10px;

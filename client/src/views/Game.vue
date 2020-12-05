@@ -1,6 +1,5 @@
 <template>
   <div class="game">
-    <!-- GAME NOT STARTED YET -->
     <template v-if="!shipsPlaced">
       <ShipPlacement :rows="rows" :cols="cols" />
       <div class="opponent-select">
@@ -16,15 +15,15 @@
       send this link to your frined:
     </div>
 
-    <template v-if="gameStarted">
-      <Status :yourTurn="yourTurn" />
-      <!-- YOU -->
+    <template v-if="shipsPlaced">
+      <Status :yourTurn="yourTurn" :waiting="!gameStarted && shipsPlaced" />
       <Board
         :rows="rows"
         :cols="cols"
         :board="board"
         :shots="shots"
         :yours="true"
+        :waiting="false"
       />
       <Board
         :rows="rows"
@@ -32,6 +31,7 @@
         :board="dummyBoard"
         :shots="opponent"
         :yours="false"
+        :waiting="!gameStarted && shipsPlaced"
       />
     </template>
   </div>
