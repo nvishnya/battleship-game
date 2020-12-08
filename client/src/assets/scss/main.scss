@@ -2,6 +2,8 @@ $margin-size: 21px;
 // header
 #app-title {
     margin-top: $margin-size;
+    font-size: 1.3em !important;
+
     // text-align: center;
     // letter-spacing: 0.2em;
 }
@@ -78,7 +80,7 @@ $orientations: "HR", "VR";
     user-select: none; //TODO use different properties for different browsers
     border-collapse: collapse;
     padding: 0;
-    // margin-top: ;
+    margin-top: 5px;
 }
 .board-cell-content {
     width: $cell-size;
@@ -93,11 +95,26 @@ $orientations: "HR", "VR";
 #app > * {
     text-align: center;
     font-family: "Special Elite", cursive;
-    font-size: larger;
+    font-size: 1.1em;
 }
 .btn {
-    width: 100px;
-    padding: 2px;
+    &:focus {
+        outline: none;
+    }
+    &:hover {
+        color: white;
+        background-color: gray;
+    }
+    border: 2px solid gray;
+    transition-duration: 0.4s;
+    width: 150px;
+    background-color: transparent;
+    color: black;
+    padding: 7px 5px 5px 5px;
+    // border: none;
+    font-size: 0.9em;
+    text-align: center;
+    text-decoration: none;
     font-family: "Special Elite", cursive;
 }
 .opponent-select {
