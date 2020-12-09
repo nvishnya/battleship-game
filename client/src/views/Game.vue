@@ -4,7 +4,20 @@
       <ShipPlacement :rows="rows" :cols="cols" />
       <div class="opponent-select">
         opponent:
-        <span>friend</span>/random
+        <button
+          :class="{ selected: friendAsOpponent == false }"
+          class="op-btn"
+          @click="createGameWithRandomOpponent"
+        >
+          random</button
+        >/
+        <button
+          :class="{ selected: friendAsOpponent == true }"
+          class="op-btn"
+          @click="createGameWithFriendOpponent"
+        >
+          friend
+        </button>
       </div>
       <div>
         <button class="btn" @click="startGame">start</button>

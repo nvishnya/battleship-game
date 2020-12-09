@@ -94,7 +94,7 @@ $orientations: "HR", "VR";
 @import url("https://fonts.googleapis.com/css2?family=Special+Elite&display=swap");
 #app > * {
     text-align: center;
-    font-family: "Special Elite", cursive;
+    font-family: "Special Elite", cursive !important;
     font-size: 1.1em;
 }
 .btn {
@@ -145,3 +145,18 @@ $orientations: "HR", "VR";
 // .clues {
 //     margin-top: 10px;
 // }
+.op-btn {
+    border: none;
+    background-color: transparent;
+    font-family: "Special Elite", cursive;
+    font-size: 1em;
+    &:focus {
+        outline: none;
+    }
+    &:hover {
+        cursor: pointer;
+    }
+}
+.selected {
+    text-decoration: underline;
+}
