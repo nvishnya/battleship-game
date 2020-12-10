@@ -22,7 +22,7 @@
                   ]"
                   draggable="true"
                   @dragstart="onDragStart($event, board[row][col])"
-                  @dblclick="rotate($event, board[row][col])"
+                  @click="rotate($event, board[row][col])"
                 ></div>
               </div>
             </td>
