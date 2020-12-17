@@ -1,3 +1,5 @@
+var _ = require("lodash");
+
 export function getSocketUrl(url, gameId) {
   gameId = gameId ? gameId : "";
   return `${url}${gameId}`;
@@ -72,4 +74,22 @@ export function getTempShipsAndNewShip(ships, shipIndex) {
 
 export function getNewOrientation(oldOrientation) {
   return oldOrientation == "HR" ? "VR" : "HR";
+}
+
+export function flipMatrix(matrix) {
+  return matrix[0].map((column, index) => matrix.map((row) => row[index]));
+
+}
+
+export function rotateMatrix(matrix) {
+  matrix = _.cloneDeep(matrix)
+  return flipMatrix(matrix.reverse())
+}
+
+export function getDifference(length, offset) {
+  return offset >= length / 2 ? offset : length - offset - 1;
+}
+
+export function getClicked(coord, offset) {
+  return coord + offset;
 }

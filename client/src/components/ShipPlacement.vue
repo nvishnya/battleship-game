@@ -42,11 +42,14 @@
 <script>
 import { mapActions, mapState } from "vuex";
 import {
+  getClicked,
+  getDifference,
   getNewOrientation,
   getOffset,
   getTempShipsAndNewShip,
   isPlacementPossible,
   placeShips,
+  rotateMatrix,
   zeros,
 } from "../helpers";
 var _ = require("lodash");
@@ -102,17 +105,51 @@ export default {
       }
     },
     rotate(event, shipIndex) {
+      if (this.ships[shipIndex].length == 1) {
+        return;
+      }
+
       let [offsetRow, offsetCol] = getOffset(event);
       let [tempShips, ship] = getTempShipsAndNewShip(this.ships, shipIndex);
 
+      let clickedX = getClicked(this.ships[shipIndex].x, offsetRow);
+      let clickedY = getClicked(this.ships[shipIndex].y, offsetCol);
+
+      let diffRow = getDifference(ship.rows, offsetRow);
+      let diffCol = getDifference(ship.cols, offsetCol);
+      let maxDiff = _.max([diffRow, diffCol]);
+
+      let size = maxDiff * 2 + 1;
+
+      let centerTemp = Math.floor(size / 2);
+      let x = centerTemp - offsetRow;
+      let y = centerTemp - offsetCol;
+
+      let shipMatrix = zeros(size, size, 0);
+      for (let i = x; i < x + ship.rows; i++) {
+        for (let j = y; j < y + ship.cols; j++) {
+          shipMatrix[i][j] = 1;
+        }
+      }
+
+      let initX = clickedX - maxDiff;
+      let initY = clickedY - maxDiff;
+
+      let newX, newY;
+      let rotated = rotateMatrix(shipMatrix);
+      for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+          if (rotated[i][j] == 1) {
+            [newX, newY] = [initX + i, initY + j];
+            [i, j] = [size, size];
+          }
+        }
+      }
+
       ship.rows = this.ships[shipIndex].cols;
       ship.cols = this.ships[shipIndex].rows;
-
-      let clickedX = this.ships[shipIndex].x + offsetRow;
-      let clickedY = this.ships[shipIndex].y + offsetCol;
-
-      ship.x = clickedX - offsetCol;
-      ship.y = clickedY - offsetRow;
+      ship.x = newX;
+      ship.y = newY;
       ship.orientation = getNewOrientation(this.ships[shipIndex].orientation);
 
       let currentBoard = placeShips(this.rows, this.cols, tempShips);
