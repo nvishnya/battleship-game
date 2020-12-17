@@ -30,9 +30,6 @@
         </tbody>
       </table>
     </div>
-    <!-- <div class="clues">
-      * double click to rotate * drag and drop to move
-    </div> -->
     <div>
       <button class="btn" @click="randomizeShips">randomize</button>
     </div>
@@ -78,9 +75,6 @@ export default {
       event.dataTransfer.dropEffect = "move";
       event.dataTransfer.effectAllowed = "move";
 
-      // let size = event.path[2].clientWidth; // + clientTop / + clientLeft
-      // let offsetRow = Math.floor(event.offsetY / size);
-      // let offsetCol = Math.floor(event.offsetX / size);
       let [offsetRow, offsetCol] = getOffset(event);
 
       event.dataTransfer.setData("shipIndex", shipIndex);
