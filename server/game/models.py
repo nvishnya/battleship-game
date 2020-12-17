@@ -195,12 +195,13 @@ class Game(models.Model):
     def add_player_to_game(self, player):
         if self.playerA is None:
             self.playerA = player
+            self.current = player
         elif self.playerB is None:
             self.playerB = player
         else:
             return False
 
-        self.save(update_fields=['playerA', 'playerB'])
+        self.save(update_fields=['playerA', 'playerB', 'current'])
         Player.update_players_statuses(player)
         return True
 
