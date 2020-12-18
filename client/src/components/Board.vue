@@ -1,7 +1,12 @@
 <template>
   <div
     v-if="shots"
-    :class="[waiting ? 'disabled' : '', , yours ? 'you' : 'opponent', 'board']"
+    :class="[
+      waiting || isOver ? 'disabled' : '',
+      ,
+      yours ? 'you' : 'opponent',
+      'board',
+    ]"
   >
     <div v-if="yours">your board</div>
     <div v-else>opponent's board</div>
@@ -36,7 +41,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 export default {
   props: {
     rows: Number,
@@ -46,6 +51,9 @@ export default {
     yours: Boolean,
 
     waiting: Boolean,
+  },
+  computed: {
+    ...mapState(["isOver"]),
   },
   methods: {
     ...mapActions(["makeMove"]),
