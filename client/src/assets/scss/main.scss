@@ -133,6 +133,9 @@ $orientations: "HR", "VR";
 .green {
     color: darkgreen;
 }
+.red {
+    color: red;
+}
 .blinking {
     animation: blinker 1s linear infinite;
 }
@@ -142,9 +145,6 @@ $orientations: "HR", "VR";
         opacity: 0;
     }
 }
-// .clues {
-//     margin-top: 10px;
-// }
 .op-btn {
     border: none;
     background-color: transparent;
@@ -159,4 +159,5 @@ $orientations: "HR", "VR";
 }
 .selected {
     text-decoration: underline;
+    font-style: italic;
 }
