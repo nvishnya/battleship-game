@@ -48,10 +48,11 @@ class GameSerializer(serializers.ModelSerializer):
     your_turn = serializers.SerializerMethodField()
     you = serializers.SerializerMethodField()
     opponent = serializers.SerializerMethodField()
+    you_won = serializers.SerializerMethodField()
 
     class Meta:
         model = Game
-        fields = ['rows', 'cols', 'your_turn', 'you', 'opponent']
+        fields = ['rows', 'cols', 'your_turn', 'you', 'opponent', 'is_over', 'you_won']
 
     def get_your_turn(self, obj):
         player = self._context.get("player")
@@ -65,3 +66,7 @@ class GameSerializer(serializers.ModelSerializer):
         player = self._context.get("player")
         opponent = obj.playerB if player == obj.playerA else obj.playerA
         return OpponentSerializer(opponent).data
+
+    def get_you_won(self, obj):
+        player = self._context.get("player")
+        return True if obj.winner == player else False 
