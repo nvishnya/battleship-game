@@ -24,8 +24,14 @@
       </div>
     </template>
 
-    <div v-if="friendAsOpponent && shipsPlaced && !gameStarted">
-      send this link to your frined:
+    <div
+      v-if="friendAsOpponent && shipsPlaced && !gameStarted"
+      :style="{ marginTop: '25px' }"
+    >
+      <div>send this link to your frined:</div>
+      <div @click="copyLink" :style="{ color: 'blue', marginTop: '10px' }">
+        [{{ link }}]
+      </div>
     </div>
 
     <template v-if="shipsPlaced">
@@ -84,6 +90,7 @@ export default {
 
       "shipsPlaced",
       "gameStarted",
+      "link",
     ]),
   },
   created() {
@@ -104,6 +111,10 @@ export default {
     onGameUpdate(event) {
       let data = JSON.parse(event.data);
       this.onSocketMessage(data);
+    },
+    copyLink() {
+      this.$clipboard(this.link);
+      alert("Link was copied!");
     },
   },
 };

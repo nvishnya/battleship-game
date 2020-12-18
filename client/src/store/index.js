@@ -27,6 +27,7 @@ export default new Vuex.Store({
     board: [],
     shots: [],
     opponent: [],
+    link: null
   },
   mutations: {
     closeSocket(state) {
@@ -48,6 +49,7 @@ export default new Vuex.Store({
       if (gameId != undefined) {
         state.savedGameId = gameId;
         state.friendAsOpponent = true;
+        state.link = document.URL;
       }
     },
     updateShips(state, ships) {
