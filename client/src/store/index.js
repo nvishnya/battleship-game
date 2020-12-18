@@ -2,7 +2,6 @@ import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
 import router from "@/router";
-// import { getSocketUrl } from "@/helpers.js";
 import { getSocketUrl, zeros } from "../helpers";
 
 Vue.use(Vuex);
@@ -21,12 +20,13 @@ export default new Vuex.Store({
     shipsPlaced: false,
     friendAsOpponent: false,
     gameStarted: false,
+    isOver: false,
+    youWon: false,
 
     yourTurn: false,
     board: [],
     shots: [],
-    opponent: []
-    // gameData: null,
+    opponent: [],
   },
   mutations: {
     closeSocket(state) {
@@ -41,7 +41,6 @@ export default new Vuex.Store({
       state.socket = new WebSocket(getSocketUrl('ws://127.0.0.1:8000/ws/', gameId));
     },
     addListeners(state, handler) {
-      // console.log(handler)
       state.handler = handler;
       state.socket.onmessage = handler;
     },
@@ -70,13 +69,17 @@ export default new Vuex.Store({
       state.shots = JSON.parse(shots)
     },
     updateOpponent(state, opponent) {
-      // console.log(opponent)
       state.opponent = JSON.parse(opponent)
     },
     updateCurrentTurn(state, yourTurn) {
       state.yourTurn = yourTurn;
+    },
+    updateGameStatus(state, isOver) {
+      state.isOver = isOver;
+    },
+    updateGameWinner(state, youWon) {
+      state.youWon = youWon;
     }
-
   },
   actions: {
     initSocket({ commit, dispatch }, payload) {
@@ -142,17 +145,15 @@ export default new Vuex.Store({
       commit("updateShots", data.you.shots)
       commit("updateOpponent", data.opponent.shots)
       commit("updateCurrentTurn", data.your_turn)
+      commit("updateGameStatus", data.is_over)
+      commit("updateGameWinner", data.you_won)
     },
     onSocketMessage({ commit, dispatch, state }, data) {
-      // console.log(commit)
-      // console.log(data.type === 'game.start')
       if (data.type === "waiting-for-opponent") {
-        // console.log(data)
         commit("placeShips");
         commit("updateBoard", data.you.board)
         commit("updateShots", data.you.shots)
         commit("updateOpponent", JSON.stringify(zeros(state.rows, state.cols, 0)))
-        // console.log("place")
       }
       else if (data.type === "game.start") {
         commit("placeShips");

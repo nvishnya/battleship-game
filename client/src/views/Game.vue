@@ -29,7 +29,7 @@
     </div>
 
     <template v-if="shipsPlaced">
-      <Status :yourTurn="yourTurn" :waiting="!gameStarted && shipsPlaced" />
+      <Status :waiting="!gameStarted && shipsPlaced" />
       <Board
         :rows="rows"
         :cols="cols"

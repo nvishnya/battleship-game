@@ -8,16 +8,23 @@
       turn.
     </p>
     <p v-if="waiting" class="blinking green">Waiting for an opponent.</p>
-    <p v-if="isOver">Game over. You win/lose</p>
+    <p v-if="isOver">
+      Game over.
+      <span :class="youWon ? 'green' : 'red'">
+        You {{ youWon ? "won!" : "lost!" }}
+      </span>
+    </p>
   </div>
 </template>
 
 <script>
+import { mapState } from "vuex";
 export default {
   props: {
-    yourTurn: Boolean,
     waiting: Boolean,
-    isOver: Boolean,
+  },
+  computed: {
+    ...mapState(["shipsPlaced", "gameStarted", "yourTurn", "isOver", "youWon"]),
   },
 };
 </script>
