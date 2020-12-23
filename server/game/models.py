@@ -192,6 +192,10 @@ class Game(models.Model):
         Player.update_players_statuses(playerA, playerB)
         return game
 
+    def end_game(self):
+        self.is_over = True
+        self.save(update_fields=['is_over'])
+
     def add_player_to_game(self, player):
         if self.playerA is None:
             self.playerA = player

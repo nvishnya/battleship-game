@@ -204,6 +204,12 @@ def game(db, game_factory):
     return game_factory(10, 10)
 
 
+def test_game_end_game(db, gameAB):
+    assert not gameAB.is_over
+    gameAB.end_game()
+    assert gameAB.is_over
+
+
 def test_game_next_player(db, gameAB):
     assert gameAB.current == gameAB.playerA
     gameAB.next_player()
@@ -216,6 +222,7 @@ def test_game_add_player_to_game(db, game, playerA, playerB, playerC):
     assert game.add_player_to_game(playerB)
     assert game.playerB.id == playerB.id
     assert not game.add_player_to_game(playerC)
+
 
 def test_game_shoot(db, gameAB):
     gameAB.playerB.board.place_ships(ship1x1_at0x0_data)
