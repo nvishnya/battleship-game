@@ -60,7 +60,8 @@ function isShipInRange(ship, maxX, maxY) {
 }
 
 export function getOffset(event) {
-  let size = event.path[2].clientWidth; // + clientTop / + clientLeft
+  let path = (event.composedPath && event.composedPath()) || event.path;
+  let size = path[2].clientWidth; // + clientTop / + clientLeft
   let offsetRow = Math.floor(event.offsetY / size);
   let offsetCol = Math.floor(event.offsetX / size);
   return [offsetRow, offsetCol]
