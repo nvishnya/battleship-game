@@ -26,10 +26,11 @@ def place_ships(player_id, rows, cols, ships):
 
 
 @database_sync_to_async
-def create_game(rows, cols, playerA_id, playerB_id):
+def create_game(rows, cols, playerA_id, playerB_id=None):
     playerA = Player.objects.get(id=playerA_id)
+    if playerB_id is None:
+        return Game.create(rows, cols, playerA)
     playerB = Player.objects.get(id=playerB_id)
-
     return Game.create(rows, cols, playerA, playerB)
 
 

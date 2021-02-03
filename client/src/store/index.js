@@ -9,6 +9,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     socket: null,
+    gameId: null,
 
     savedGameId: null,
     handler: null,
@@ -27,7 +28,6 @@ export default new Vuex.Store({
     board: [],
     shots: [],
     opponent: [],
-    link: null
   },
   mutations: {
     closeSocket(state) {
@@ -45,17 +45,10 @@ export default new Vuex.Store({
       state.handler = handler;
       state.socket.onmessage = handler;
     },
-    saveGameId(state, gameId) {
-      if (gameId != undefined) {
-        state.savedGameId = gameId;
-        state.friendAsOpponent = true;
-        state.link = document.URL;
-      }
-    },
     updateShips(state, ships) {
       state.ships = ships;
     },
-    setFriendOpponent(state, friend) {
+    setOpponent(state, friend) {
       state.friendAsOpponent = friend;
     },
     startGame(state) {
@@ -81,44 +74,33 @@ export default new Vuex.Store({
     },
     updateGameWinner(state, youWon) {
       state.youWon = youWon;
-    }
+    },
+    updateSocket(state, url) {
+      state.socket = new WebSocket(url);
+    },
+    setGameId(state, id) {
+      state.gameId = id;
+    },
   },
   actions: {
     initSocket({ commit, dispatch }, payload) {
+      commit('updateSocket', 'ws://127.0.0.1:8000/ws/')
+      commit("addListeners", payload.handler);
+      dispatch("randomizeShips");
       let gameId = router.currentRoute.params.id;
-      if (payload.reloadShips) {
-        dispatch("randomizeShips");
-      }
-      commit("saveGameId", gameId);
-      commit("closeSocket");
-      commit("changeSocketURL", gameId);
-      if (payload != undefined && payload.handler != undefined) {
-        commit("addListeners", payload.handler);
-      }
+      gameId = gameId == undefined ? null : gameId;
+      commit("setGameId", gameId)
     },
 
     async createGameWithFriendOpponent({ dispatch, commit, state }) {
       if (!state.friendAsOpponent) {
-        let gameId = state.savedGameId;
-        if (state.savedGameId == null) {
-          const response = await axios.post("new-game/", {
-            rows: state.rows,
-            cols: state.cols
-          });
-          gameId = response.data.game_id;
-          commit("saveGameId", gameId);
-        }
-        commit("setFriendOpponent", true);
-        router.push({ name: "Game", params: { id: gameId } });
-        dispatch("initSocket", { reloadShips: false, handler: state.handler });
+        commit("setOpponent", true);
       }
     },
 
     createGameWithRandomOpponent({ dispatch, state, commit }) {
       if (state.friendAsOpponent) {
-        commit("setFriendOpponent", false);
-        router.push({ name: "Game" });
-        dispatch("initSocket", { reloadShips: false, handler: state.handler });
+        commit("setOpponent", false);
       }
     },
 
@@ -132,17 +114,20 @@ export default new Vuex.Store({
       );
       commit("updateShips", response.data);
     },
-    startGame({ state, dispatch }) {
+
+    startGame({ state, dispatch, commit }) {
       let payload = {
         command: "start",
         ships: state.ships,
         rows: state.rows,
-        cols: state.cols
+        cols: state.cols,
+        game_id: state.gameId,
+        friend_opponent: state.friendAsOpponent
       };
       dispatch("sendSocketMessage", payload);
     },
+
     updateGame({ commit }, data) {
-      // console.log(JSON.parse(data.you.shots))
       commit("updateBoard", data.you.board)
       commit("updateShots", data.you.shots)
       commit("updateOpponent", data.opponent.shots)
@@ -150,8 +135,10 @@ export default new Vuex.Store({
       commit("updateGameStatus", data.is_over)
       commit("updateGameWinner", data.you_won)
     },
+
     onSocketMessage({ commit, dispatch, state }, data) {
       if (data.type === "waiting-for-opponent") {
+        commit("setGameId", data.game_id)
         commit("placeShips");
         commit("updateBoard", data.you.board)
         commit("updateShots", data.you.shots)
@@ -165,6 +152,7 @@ export default new Vuex.Store({
         dispatch("updateGame", data.game)
       }
     },
+    
     makeMove({ dispatch }, payload) {
       payload = {
         command: "move",

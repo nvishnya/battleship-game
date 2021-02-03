@@ -17,8 +17,8 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         self.player = await create_player(self.channel_name)
         self.player_id = self.player.id
-        self.game_id = self.scope['url_route']['kwargs'].get('game_id', None)
-        self.group_name = self.get_group_name(self.game_id)
+        self.game_id = None
+        self.group_name = None
         await self.accept()
 
     async def disconnect(self, close_code):
@@ -28,7 +28,11 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
     async def receive_json(self, content):
         command = content.get('command', None)
         if command == 'start':
-            await self.start(content['rows'], content['cols'], content['ships'])
+            await self.start(content['game_id'],
+                             content['rows'],
+                             content['cols'],
+                             content['ships'],
+                             content['friend_opponent'])
         elif command == 'move':
             await self.move(content['x'], content['y'])
 
@@ -47,10 +51,12 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         )
         await delete_player(self.player_id)
 
-    async def start(self, rows, cols, ships):
+    async def start(self, game_id, rows, cols, ships, friend_opponent):
         await place_ships(self.player_id, rows, cols, ships)
+        self.game_id = game_id
+        self.group_name = self.get_group_name(game_id)
         self.rows, self.cols = rows, cols
-        if self.game_id is None:
+        if not friend_opponent:
             await self.random_opponent()
         else:
             await self.friend_opponent()
@@ -77,20 +83,18 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         )
 
     async def friend_opponent(self):
-        game = await get_game_or_error(self.game_id)
-        await add_player_to_game(game, self.player_id)
+        if self.game_id is None:
+            game = await create_game(self.rows, self.cols, self.player_id)
+            self.game_id = game.id
+            self.group_name = self.get_group_name(self.game_id)
 
-#         if status is False:
-#             await self.send_json({'event': 'game-already-started'})
-#             return
-
-        await self.add_players_to_group(self.group_name, self.player)
-        game = await get_game_or_error(self.game_id)
-
-        if game.playerB_id is None:
             data = await get_player_data(self.player_id)
-            await self.send_json({'type': 'waiting-for-opponent', "you": data})
+            await self.add_players_to_group(self.group_name, game.playerA)
+            await self.send_json({'type': 'waiting-for-opponent', "you": data, 'game_id': game.id})
         else:
+            game = await get_game_or_error(self.game_id)
+            await add_player_to_game(game, self.player_id)
+            await self.add_players_to_group(self.group_name, self.player)
             await self.channel_layer.group_send(
                 self.group_name,
                 {

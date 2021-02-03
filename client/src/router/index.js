@@ -6,8 +6,13 @@ Vue.use(VueRouter);
 
 const routes = [
   {
-    path: "/:id?",
+    path: "/",
     name: "Game",
+    component: Game
+  },
+  {
+    path: "/join:id?",
+    name: "joinGame",
     component: Game
   }
 ];

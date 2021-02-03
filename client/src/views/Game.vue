@@ -90,14 +90,18 @@ export default {
 
       "shipsPlaced",
       "gameStarted",
-      "link",
+      "gameId"
+      // "link",
     ]),
+    link(){
+      return document.URL + 'join' + this.gameId;
+    }
   },
   created() {
     this.dummyBoard = zeros(this.rows, this.cols, 0);
     this.$store.dispatch("initSocket", {
       handler: this.onGameUpdate,
-      reloadShips: true,
+      // reloadShips: true,
     });
   },
   methods: {
