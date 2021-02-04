@@ -1,6 +1,6 @@
 <template>
   <div class="status-bar">
-    <p v-if="!waiting && !isOver">
+    <p v-if="!waiting && !isOver && !opponentLeft">
       It's
       <span class="green">
         {{ yourTurn ? "your" : "opponent's" }}
@@ -14,6 +14,9 @@
         You {{ youWon ? "won!" : "lost!" }}
       </span>
     </p>
+    <p v-if="opponentLeft" class="red">
+      Opponent has left the game.
+    </p>
   </div>
 </template>
 
@@ -24,7 +27,7 @@ export default {
     waiting: Boolean,
   },
   computed: {
-    ...mapState(["shipsPlaced", "gameStarted", "yourTurn", "isOver", "youWon"]),
+    ...mapState(["shipsPlaced", "gameStarted", "yourTurn", "isOver", "youWon", "opponentLeft"]),
   },
 };
 </script>

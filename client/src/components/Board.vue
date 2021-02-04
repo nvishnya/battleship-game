@@ -2,7 +2,7 @@
   <div
     v-if="shots"
     :class="[
-      waiting || isOver ? 'disabled' : '',
+      waiting || isOver || opponentLeft ? 'disabled' : '',
       ,
       yours ? 'you' : 'opponent',
       'board',
@@ -53,12 +53,10 @@ export default {
     waiting: Boolean,
   },
   computed: {
-    ...mapState(["isOver"]),
+    ...mapState(["isOver", "opponentLeft"]),
   },
   methods: {
     ...mapActions(["makeMove"]),
   },
 };
 </script>
-// :class="[ // getShipClassName( // ships[board[x][y]]['length'], //
-ships[board[x][y]]['orientation'] // ), // ]"

@@ -24,6 +24,7 @@ export default new Vuex.Store({
     isOver: false,
     youWon: false,
 
+    opponentLeft: false,
     yourTurn: false,
     board: [],
     shots: [],
@@ -84,7 +85,9 @@ export default new Vuex.Store({
     closeSocket(state) {
       state.socket.close()
     },
-
+    opponentLeft(state) {
+      state.opponentLeft = true;
+    },
     reset(state) {
       state.gameId = null
       state.ships = []
@@ -97,6 +100,7 @@ export default new Vuex.Store({
       state.board = []
       state.shots = []
       state.opponent = []
+      state.opponentLeft = false
     },
   },
   actions: {
@@ -168,8 +172,9 @@ export default new Vuex.Store({
       } else if (data.type === "game.update") {
         dispatch("updateGame", data.game)
       }
-      // else if (data.type == "opponent.left"){
-      // }
+      else if (data.type == "opponent.left") {
+        commit("opponentLeft")
+      }
     },
 
     makeMove({ dispatch }, payload) {
