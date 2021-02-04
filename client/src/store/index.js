@@ -81,6 +81,23 @@ export default new Vuex.Store({
     setGameId(state, id) {
       state.gameId = id;
     },
+    closeSocket(state) {
+      state.socket.close()
+    },
+
+    reset(state) {
+      state.gameId = null
+      state.ships = []
+      state.shipsPlaced = false
+      state.friendAsOpponent = false
+      state.gameStarted = false
+      state.isOver = false
+      state.youWon = false
+      state.yourTurn = false
+      state.board = []
+      state.shots = []
+      state.opponent = []
+    },
   },
   actions: {
     initSocket({ commit, dispatch }, payload) {
@@ -151,8 +168,10 @@ export default new Vuex.Store({
       } else if (data.type === "game.update") {
         dispatch("updateGame", data.game)
       }
+      // else if (data.type == "opponent.left"){
+      // }
     },
-    
+
     makeMove({ dispatch }, payload) {
       payload = {
         command: "move",
@@ -160,6 +179,15 @@ export default new Vuex.Store({
         y: payload.y,
       };
       dispatch("sendSocketMessage", payload);
+    },
+
+    leaveGame({ state, commit, dispatch }) {
+      commit("closeSocket");
+      commit("reset");
+      commit('updateSocket', 'ws://127.0.0.1:8000/ws/')
+      commit("addListeners", state.handler);
+      dispatch("randomizeShips");
+      router.push({ name: "Game" });
     },
   },
 });

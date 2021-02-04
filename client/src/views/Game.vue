@@ -4,13 +4,15 @@
       <ShipPlacement :rows="rows" :cols="cols" />
       <div class="opponent-select">
         opponent:
-        <button
-          :class="{ selected: friendAsOpponent == false }"
-          class="op-btn"
-          @click="createGameWithRandomOpponent"
-        >
-          random</button
-        >/
+        <template v-if="gameId == null">
+          <button
+            :class="{ selected: friendAsOpponent == false }"
+            class="op-btn"
+            @click="createGameWithRandomOpponent"
+          >
+            random</button
+          >/
+        </template>
         <button
           :class="{ selected: friendAsOpponent == true }"
           class="op-btn"
@@ -52,6 +54,14 @@
         :yours="false"
         :waiting="!gameStarted && shipsPlaced"
       />
+      <div>
+        <button
+          class="op-btn-leave"
+          @click="leaveGame"
+        >
+          leave game
+        </button>
+      </div>
     </template>
   </div>
 </template>
@@ -90,12 +100,12 @@ export default {
 
       "shipsPlaced",
       "gameStarted",
-      "gameId"
+      "gameId",
       // "link",
     ]),
-    link(){
-      return document.URL + 'join' + this.gameId;
-    }
+    link() {
+      return document.URL + "join" + this.gameId;
+    },
   },
   created() {
     this.dummyBoard = zeros(this.rows, this.cols, 0);
@@ -111,6 +121,7 @@ export default {
       "onSocketMessage",
       "updateGame",
       "startGame",
+      "leaveGame"
     ]),
     onGameUpdate(event) {
       let data = JSON.parse(event.data);

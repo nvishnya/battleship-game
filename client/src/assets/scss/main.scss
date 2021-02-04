@@ -156,6 +156,11 @@ $orientations: "HR", "VR";
     &:hover {
         cursor: pointer;
     }
+    &-leave {
+        @extend .op-btn;
+        margin-top: 30px;
+        color: red;
+    }
 }
 .selected {
     text-decoration: underline;
