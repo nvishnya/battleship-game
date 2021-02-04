@@ -24,6 +24,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
     async def disconnect(self, close_code):
         if self.game_id is not None:
             await self.leave()
+        await delete_player(self.player_id)
 
     async def receive_json(self, content):
         command = content.get('command', None)
@@ -49,7 +50,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             self.group_name,
             self.channel_name,
         )
-        await delete_player(self.player_id)
+        # await delete_player(self.player_id)
 
     async def start(self, game_id, rows, cols, ships, friend_opponent):
         await place_ships(self.player_id, rows, cols, ships)
