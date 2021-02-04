@@ -3,7 +3,7 @@ from game import consumers
 
 
 websocket_urlpatterns = [
-    path('ws/', consumers.GameConsumer),
-    path('ws/<int:game_id>', consumers.GameConsumer)
+    path('ws/', consumers.GameConsumer.as_asgi()),
+    path('ws/<int:game_id>', consumers.GameConsumer.as_asgi())
 
 ]

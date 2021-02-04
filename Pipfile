@@ -16,6 +16,7 @@ scipy = "*"
 django-picklefield = "*"
 djangorestframework = "*"
 channels = "*"
+channels-redis = "*"
 
 [requires]
 python_version = "3.8"
