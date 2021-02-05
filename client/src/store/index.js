@@ -36,12 +36,6 @@ export default new Vuex.Store({
         state.socket.close();
       }
     },
-    saveInitialGameId(state, gameId) {
-      state.initialGameId = gameId;
-    },
-    changeSocketURL(state, gameId) {
-      state.socket = new WebSocket(getSocketUrl('ws://127.0.0.1:8000/ws/', gameId));
-    },
     addListeners(state, handler) {
       state.handler = handler;
       state.socket.onmessage = handler;
@@ -105,7 +99,9 @@ export default new Vuex.Store({
   },
   actions: {
     initSocket({ commit, dispatch }, payload) {
-      commit('updateSocket', 'ws://127.0.0.1:8000/ws/')
+      // commit('updateSocket', 'ws://localhost:8000/ws/')
+      commit('updateSocket', 'ws://'+ window.location.hostname + ':8000/ws/')
+
       commit("addListeners", payload.handler);
       dispatch("randomizeShips");
       let gameId = router.currentRoute.params.id;
@@ -189,7 +185,7 @@ export default new Vuex.Store({
     leaveGame({ state, commit, dispatch }) {
       commit("closeSocket");
       commit("reset");
-      commit('updateSocket', 'ws://127.0.0.1:8000/ws/')
+      commit('updateSocket', 'ws://'+ window.location.hostname + ':8000/ws/')
       commit("addListeners", state.handler);
       dispatch("randomizeShips");
       router.push({ name: "Game" });
