@@ -2,7 +2,7 @@
   <div
     v-if="shots"
     :class="[
-      waiting || isOver || opponentLeft ? 'disabled' : '',
+      waiting || isOver || opponentLeft || ((!yours && !yourTurn) || (yours && yourTurn)) ? 'disabled' : '',
       ,
       yours ? 'you' : 'opponent',
       'board',
@@ -53,7 +53,7 @@ export default {
     waiting: Boolean,
   },
   computed: {
-    ...mapState(["isOver", "opponentLeft"]),
+    ...mapState(["isOver", "opponentLeft", "yourTurn"]),
   },
   methods: {
     ...mapActions(["makeMove"]),
