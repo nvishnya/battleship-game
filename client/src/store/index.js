@@ -6,29 +6,31 @@ import { getSocketUrl, zeros } from "../helpers";
 
 Vue.use(Vuex);
 
+const initialState = {
+  gameId: null,
+  ships: [],
+  shipsPlaced: false,
+  friendAsOpponent: false,
+  gameStarted: false,
+  isOver: false,
+  youWon: false,
+  opponentLeft: false,
+  yourTurn: false,
+  board: [],
+  shots: [],
+  opponent: []
+}
+
 export default new Vuex.Store({
   state: {
-    socket: null,
-    gameId: null,
+    ...initialState,
 
-    savedGameId: null,
+    socket: null,
     handler: null,
 
-    ships: [],
     rows: 10,
     cols: 10,
 
-    shipsPlaced: false,
-    friendAsOpponent: false,
-    gameStarted: false,
-    isOver: false,
-    youWon: false,
-
-    opponentLeft: false,
-    yourTurn: false,
-    board: [],
-    shots: [],
-    opponent: [],
   },
   mutations: {
     closeSocket(state) {
@@ -83,29 +85,20 @@ export default new Vuex.Store({
       state.opponentLeft = true;
     },
     reset(state) {
-      state.gameId = null
-      state.ships = []
-      state.shipsPlaced = false
-      state.friendAsOpponent = false
-      state.gameStarted = false
-      state.isOver = false
-      state.youWon = false
-      state.yourTurn = false
-      state.board = []
-      state.shots = []
-      state.opponent = []
-      state.opponentLeft = false
+      Object.assign(state, initialState);
     },
   },
   actions: {
     initSocket({ commit, dispatch }, payload) {
       // commit('updateSocket', 'ws://localhost:8000/ws/')
-      commit('updateSocket', 'ws://'+ window.location.hostname + ':8000/ws/')
+      commit('updateSocket', 'ws://' + window.location.hostname + ':8000/ws/')
 
       commit("addListeners", payload.handler);
       dispatch("randomizeShips");
       let gameId = router.currentRoute.params.id;
       gameId = gameId == undefined ? null : gameId;
+      let friend = gameId == null ? false : true;
+      commit("setOpponent", friend)
       commit("setGameId", gameId)
     },
 
@@ -185,7 +178,7 @@ export default new Vuex.Store({
     leaveGame({ state, commit, dispatch }) {
       commit("closeSocket");
       commit("reset");
-      commit('updateSocket', 'ws://'+ window.location.hostname + ':8000/ws/')
+      commit('updateSocket', 'ws://' + window.location.hostname + ':8000/ws/')
       commit("addListeners", state.handler);
       dispatch("randomizeShips");
       router.push({ name: "Game" });
