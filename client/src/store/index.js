@@ -2,7 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
 import router from "@/router";
-import { getSocketUrl, zeros } from "../helpers";
+import { zeros } from "../helpers";
 
 Vue.use(Vuex);
 
@@ -21,6 +21,10 @@ const initialState = {
   opponent: []
 }
 
+const mutate = (state, prop, value) => {
+  state[prop] = value;
+}
+
 export default new Vuex.Store({
   state: {
     ...initialState,
@@ -30,69 +34,34 @@ export default new Vuex.Store({
 
     rows: 10,
     cols: 10,
-
   },
+
   mutations: {
-    closeSocket(state) {
-      if (state.socket != null) {
-        state.socket.close();
-      }
-    },
-    addListeners(state, handler) {
+    updateShips: (state, ships) => { mutate(state, "ships", ships) },
+    setOpponent: (state, friend) => { mutate(state, "friendAsOpponent", friend) },
+    startGame: (state) => { mutate(state, "gameStarted", true) },
+    placeShips: (state) => { mutate(state, "shipsPlaced", true) },
+    setGameId: (state, id) => { mutate(state, "gameId", id) },
+    opponentLeft: (state) => { mutate(state, "opponentLeft", true) },
+    updateBoard: (state, board) => { mutate(state, "board", JSON.parse(board)) },
+    updateShots: (state, shots) => { mutate(state, "shots", JSON.parse(shots)) },
+    updateOpponent: (state, opponent) => { mutate(state, "opponent", JSON.parse(opponent)) },
+    updateCurrentTurn: (state, yourTurn) => { mutate(state, "yourTurn", yourTurn) },
+    updateGameStatus: (state, isOver) => { mutate(state, "isOver", isOver) },
+    updateGameWinner: (state, youWon) => { mutate(state, "youWon", youWon) },
+    updateSocket: (state, url) => { mutate(state, "socket", new WebSocket(url)) },
+    closeSocket: (state) => { state.socket.close() },
+    reset: (state) => { Object.assign(state, initialState) },
+    addListeners: (state, handler) => {
       state.handler = handler;
       state.socket.onmessage = handler;
     },
-    updateShips(state, ships) {
-      state.ships = ships;
-    },
-    setOpponent(state, friend) {
-      state.friendAsOpponent = friend;
-    },
-    startGame(state) {
-      state.gameStarted = true;
-    },
-    placeShips(state) {
-      state.shipsPlaced = true;
-    },
-    updateBoard(state, board) {
-      state.board = JSON.parse(board)
-    },
-    updateShots(state, shots) {
-      state.shots = JSON.parse(shots)
-    },
-    updateOpponent(state, opponent) {
-      state.opponent = JSON.parse(opponent)
-    },
-    updateCurrentTurn(state, yourTurn) {
-      state.yourTurn = yourTurn;
-    },
-    updateGameStatus(state, isOver) {
-      state.isOver = isOver;
-    },
-    updateGameWinner(state, youWon) {
-      state.youWon = youWon;
-    },
-    updateSocket(state, url) {
-      state.socket = new WebSocket(url);
-    },
-    setGameId(state, id) {
-      state.gameId = id;
-    },
-    closeSocket(state) {
-      state.socket.close()
-    },
-    opponentLeft(state) {
-      state.opponentLeft = true;
-    },
-    reset(state) {
-      Object.assign(state, initialState);
-    },
   },
+
   actions: {
     initSocket({ commit, dispatch }, payload) {
       // commit('updateSocket', 'ws://localhost:8000/ws/')
       commit('updateSocket', 'ws://' + window.location.hostname + ':8000/ws/')
-
       commit("addListeners", payload.handler);
       dispatch("randomizeShips");
       let gameId = router.currentRoute.params.id;
