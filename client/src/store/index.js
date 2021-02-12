@@ -96,12 +96,10 @@ export default new Vuex.Store({
 
     startGame({ state, dispatch, commit }) {
       let payload = {
-        command: "start",
+        action: "start",
         ships: state.ships,
-        rows: state.rows,
-        cols: state.cols,
-        game_id: state.gameId,
-        friend_opponent: state.friendAsOpponent
+        game_to_join_id: state.gameId,
+        friend_as_opponent: state.friendAsOpponent
       };
       dispatch("sendSocketMessage", payload);
     },
@@ -116,28 +114,28 @@ export default new Vuex.Store({
     },
 
     onSocketMessage({ commit, dispatch, state }, data) {
-      if (data.type === "waiting-for-opponent") {
+      if (data.action === "game.wait") {
         commit("setGameId", data.game_id)
         commit("placeShips");
         commit("updateBoard", data.you.board)
         commit("updateShots", data.you.shots)
         commit("updateOpponent", JSON.stringify(zeros(state.rows, state.cols, 0)))
       }
-      else if (data.type === "game.start") {
+      else if (data.action === "game.start") {
         commit("placeShips");
         commit("startGame");
         dispatch("updateGame", data.game)
-      } else if (data.type === "game.update") {
+      } else if (data.action === "game.update") {
         dispatch("updateGame", data.game)
       }
-      else if (data.type == "opponent.left") {
+      else if (data.action == "game.leave") {
         commit("opponentLeft")
       }
     },
 
     makeMove({ dispatch }, payload) {
       payload = {
-        command: "move",
+        action: "shoot",
         x: payload.x,
         y: payload.y,
       };
