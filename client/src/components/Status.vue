@@ -14,7 +14,7 @@
         You {{ youWon ? "won!" : "lost!" }}
       </span>
     </p>
-    <p v-if="opponentLeft" class="red">
+    <p v-if="opponentLeft && !isOver" class="red">
       Opponent has left the game.
     </p>
   </div>
