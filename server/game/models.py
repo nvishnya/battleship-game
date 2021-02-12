@@ -9,7 +9,6 @@ import numpy as np
 
 class Player(models.Model):
     channel_name = models.CharField(max_length=125)
-    username = models.CharField(max_length=25, unique=True, null=True)
     is_busy = models.BooleanField(default=False)
 
     @staticmethod
