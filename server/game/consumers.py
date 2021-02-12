@@ -97,6 +97,9 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         )
 
     async def game_update(self, event):
+        if event['action'] == 'game.start':
+            self.update_game_info(event['game_id'])
+
         data = await get_game_data(event['game_id'], self.player_id)
         await self.send_json({'action': event['action'],
                               'game': data})
