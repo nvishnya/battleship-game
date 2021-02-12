@@ -33,7 +33,7 @@ class YouSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Player
-        fields = ['username', 'board', 'shots', ]
+        fields = ['board', 'shots', ]
 
 
 class OpponentSerializer(serializers.ModelSerializer):
@@ -41,7 +41,7 @@ class OpponentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Player
-        fields = ['username', 'shots']
+        fields = ['shots']
 
 
 class GameSerializer(serializers.ModelSerializer):
@@ -52,7 +52,7 @@ class GameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Game
-        fields = ['rows', 'cols', 'your_turn', 'you', 'opponent', 'is_over', 'you_won']
+        fields = ['your_turn', 'you', 'opponent', 'is_over', 'you_won']
 
     def get_your_turn(self, obj):
         player = self._context.get("player")
