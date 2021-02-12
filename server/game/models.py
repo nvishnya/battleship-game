@@ -36,7 +36,7 @@ class Player(models.Model):
         self.is_busy = True
         self.save(update_fields=['is_busy'])
 
-    def create_board_and_place_ships(self, rows, cols, ships):
+    def create_board_and_place_ships(self, ships, rows, cols):
         board = Board.create(self, rows, cols)
         return board.place_ships(*ships)
 
@@ -182,7 +182,7 @@ class Game(models.Model):
                                 related_name="playerB", null=True, blank=True)
 
     @staticmethod
-    def create(rows, cols, playerA=None, playerB=None):
+    def create(playerA, playerB=None, rows=10, cols=10):
         game = Game.objects.create(rows=rows,
                                    cols=cols,
                                    playerA=playerA,
