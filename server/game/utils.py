@@ -3,6 +3,12 @@ from channels.db import database_sync_to_async
 from game.serializers import GameSerializer, YouSerializer
 
 
+def get_game_and_player(game_id, player_id):
+    game = Game.objects.get(id=game_id)
+    player = Player.objects.get(id=player_id)
+    return game, player
+
+
 @database_sync_to_async
 def can_game_be_joined(self, game_id):
     temp = Game.objects.filter(id=game_id, started=False)
@@ -33,15 +39,13 @@ def create_new_game(playerA_id, playerB_id=None, rows=10, cols=10):
 
 @database_sync_to_async
 def add_player_to_game(game_id, player_id):
-    game = Game.objects.get(id=game_id)
-    player = Player.objects.get(id=player_id)
+    game, player = get_game_and_player(game_id, player_id)
     return game.add_player_to_game(player)
 
 
 @database_sync_to_async
 def get_game_data(game_id, player_id):
-    game = Game.objects.get(id=game_id)
-    player = Player.objects.get(id=player_id)
+    game, player = get_game_and_player(game_id, player_id)
     return GameSerializer(game, context={"player": player}).data
 
 
@@ -59,8 +63,7 @@ def get_random_opponent(player_id):
 
 @database_sync_to_async
 def shoot_at(x, y, game_id, player_id):
-    game = Game.objects.get(id=game_id)
-    player = Player.objects.get(id=player_id)
+    game, player = get_game_and_player(game_id, player_id)
     game.shoot(player, x, y)
 
 
