@@ -188,7 +188,7 @@ def test_ship_generate_random_ship(db):
 @pytest.fixture
 def game_factory(db):
     def create_game(rows, cols, playerA=None, playerB=None):
-        return Game.create(rows, cols, playerA, playerB)
+        return Game.create(playerA, playerB, rows, cols)
     return create_game
 
 
@@ -266,7 +266,7 @@ def test_player_get_random_available_player(db, playerA, playerB):
 
 
 def test_player_create_board_and_place_ships(db, playerC):
-    playerC.create_board_and_place_ships(10, 10, [ship1x3_at4x4_data])
+    playerC.create_board_and_place_ships([ship1x3_at4x4_data], 10, 10)
     assert Board.objects.all().count() == 1
     assert Ship.objects.all().count() == 1
     assert Coordinate.objects.count() == 3
