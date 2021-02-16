@@ -70,3 +70,7 @@ def shoot_at(x, y, game_id, player_id):
 @database_sync_to_async
 def delete_player(player_id):
     Player.objects.get(id=player_id).delete()
+
+@database_sync_to_async
+def leave_game(player_id, game_id=None):
+    Player.objects.get(id=player_id).leave_game(game_id)

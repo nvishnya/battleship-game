@@ -276,3 +276,17 @@ def test_player_update_player_statuses(db, playerA, ):
     assert not playerA.is_busy
     Player.update_players_statuses(playerA, None)
     assert playerA.is_busy
+
+
+def test_player_leave_game(db, gameAB):
+    playerA, playerB = gameAB.playerA, gameAB.playerB
+    assert Board.objects.filter(player=playerA).count() == 1
+    assert Board.objects.filter(player=playerB).count() == 1
+    assert Game.objects.all().count() == 1
+
+    playerA.leave_game(gameAB.id)
+    assert Board.objects.filter(player=playerA).count() == 0
+    assert Game.objects.all().count() == 0
+
+    playerB.leave_game(gameAB.id)
+    assert Board.objects.filter(player=playerB).count() == 0

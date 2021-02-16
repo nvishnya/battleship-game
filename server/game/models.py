@@ -11,6 +11,16 @@ class Player(models.Model):
     channel_name = models.CharField(max_length=125)
     is_busy = models.BooleanField(default=False)
 
+    def leave_game(self, game_id=None):
+        self.set_busy(False)
+#         REMOVE DUPLICATIONS
+        board_temp = Board.objects.filter(player=self)
+        if board_temp.count() != 0:
+            board_temp[0].delete()
+        game_temp = Game.objects.filter(id=game_id)
+        if game_temp.count() != 0:
+            game_temp[0].delete()
+
     @staticmethod
     def create(channel_name):
         return Player.objects.create(channel_name=channel_name)
@@ -31,8 +41,8 @@ class Player(models.Model):
             index = np.random.randint(0, available.count())
             return available[index]
 
-    def set_busy(self):
-        self.is_busy = True
+    def set_busy(self, is_busy=True):
+        self.is_busy = is_busy
         self.save(update_fields=['is_busy'])
 
     def create_board_and_place_ships(self, ships, rows, cols):
