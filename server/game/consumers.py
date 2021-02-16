@@ -1,7 +1,7 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from game.utils import can_game_be_joined, create_player, place_ships,\
     create_new_game, add_player_to_game, get_game_data, get_player_data,\
-    get_random_opponent, shoot_at, delete_player
+    get_random_opponent, shoot_at, delete_player, leave_game
 
 
 class GameConsumer(AsyncJsonWebsocketConsumer):
@@ -34,7 +34,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             await self.shoot(content['x'],
                              content['y'])
         elif action == 'leave':
-            self.leave()
+            await self.leave()
 
     async def start(self, ships, friend_as_opponent, game_to_join_id):
         if game_to_join_id is not None and not can_game_be_joined(game_to_join_id):
@@ -88,13 +88,15 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         })
 
     async def leave(self):
+        await self.channel_layer.group_discard(
+            self.game_group,
+            self.channel_name,
+        )
         await self.channel_layer.group_send(self.game_group, {
             'type': 'game.leave'
         })
-        await self.channel_layer.group_discard(
-            self.group_name,
-            self.channel_name,
-        )
+        await leave_game(self.player_id, self.game_id)
+        self.update_game_info(None)
 
     async def game_update(self, event):
         if event['action'] == 'game.start':

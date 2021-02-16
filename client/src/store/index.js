@@ -143,10 +143,11 @@ export default new Vuex.Store({
     },
 
     leaveGame({ state, commit, dispatch }) {
-      commit("closeSocket");
+      let payload = {
+        action: 'leave'
+      }
+      dispatch("sendSocketMessage", payload);
       commit("reset");
-      commit('updateSocket', 'ws://' + window.location.hostname + ':8000/ws/')
-      commit("addListeners", state.handler);
       dispatch("randomizeShips");
       router.push({ name: "Game" });
     },
