@@ -2,7 +2,7 @@
   <div
     v-if="shots"
     :class="[
-      waiting || isOver || opponentLeft || ((!yours && !yourTurn) || (yours && yourTurn)) ? 'disabled' : '',
+      waiting || isOver || opponentLeft || ((!yours && !yourTurn) || (yours && yourTurn)) ? 'board-disabled' : '',
       ,
       yours ? 'you' : 'opponent',
       'board',
@@ -13,7 +13,15 @@
     <table :class="['board-table']">
       <tbody>
         <tr v-for="(_, x) in rows" :key="x">
-          <td v-for="(_, y) in cols" :key="y" class="board-cell">
+          <td
+            v-for="(_, y) in cols"
+            :key="y"
+            class="board-cell"
+            :class="{
+              'board-cell-hit': shots[x][y] == 2,
+              'board-cell-ship-part': board[x][y] != 0,
+            }"
+          >
             <div
               @click="
                 if (!waiting && !yours && shots[x][y] == 0) {

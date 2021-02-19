@@ -1,101 +1,72 @@
+@import url("https://fonts.googleapis.com/css2?family=Special+Elite&display=swap");
+// COLORS
+$red: tomato;
+$green: seagreen;
+$blue: cadetblue;
+$orange: darkorange;
+
+// MAIN
 $margin-size: 21px;
-// header
+$margin-size-button: 11px;
+
+html {
+    min-width: fit-content;
+}
 #app-title {
     margin-top: $margin-size;
     font-size: 1.3em !important;
-
-    // text-align: center;
-    // letter-spacing: 0.2em;
 }
-// board
-// $ship-color: rgba(140, 0, 255, 0.226);
-$ship-color: rgba(0, 0, 0, 0.226);
-$shot-miss-size: 5px;
-.ship-part {
-    background-color: $ship-color;
-    height: inherit;
-    width: inherit;
-}
-.shot-miss {
-    background-color: blue;
-    width: $shot-miss-size;
-    height: $shot-miss-size;
-    border-radius: 50%;
-    position: relative;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-.shot-hit {
-    width: inherit;
-    height: inherit;
-    // background-color: red !important;
-    background: linear-gradient(
-            to top left,
-            $ship-color 0%,
-            $ship-color calc(50% - 0.8px),
-            rgb(255, 0, 0) 50%,
-            $ship-color calc(50% + 0.8px),
-            $ship-color 100%
-        ),
-        linear-gradient(
-            to top right,
-            rgba(0, 0, 0, 0) 0%,
-            rgba(0, 0, 0, 0) calc(50% - 0.8px),
-            rgb(255, 0, 0) 50%,
-            rgba(0, 0, 0, 0) calc(50% + 0.8px),
-            rgba(0, 0, 0, 0) 100%
-        );
-    // border: 1px red;
-}
-
-// place
-$cell-size: 41px;
-$cell-border: 1px;
-// $ship-color: rgba(140, 0, 255, 0.226);
-$orientations: "HR", "VR";
-
-@for $length from 1 through 5 {
-    @each $orientation in $orientations {
-        .ship-#{$orientation}-#{$length} {
-            z-index: 2;
-            position: absolute;
-
-            $lw: if($orientation== "HR", $length, 1);
-            $lh: if($orientation== "VR", $length, 1);
-
-            width: $cell-size * $lw + $cell-border * $lw;
-            height: $cell-size * $lh + $cell-border * $lh;
-            background: $ship-color;
-        }
-    }
-}
-.board {
-    width: 10 * $cell-size + 11 * $cell-border;
-    height: 10 * $cell-size + 11 * $cell-border;
-    margin: $margin-size;
-    display: inline-block;
-}
-.board-table {
-    user-select: none; //TODO use different properties for different browsers
-    border-collapse: collapse;
-    padding: 0;
-    margin-top: 5px;
-}
-.board-cell-content {
-    width: $cell-size;
-    height: $cell-size;
-    // background-color: indigo;
-}
-.board-cell {
-    border: $cell-border solid grey;
-    padding: 0;
-}
-@import url("https://fonts.googleapis.com/css2?family=Special+Elite&display=swap");
 #app > * {
     text-align: center;
     font-family: "Special Elite", cursive !important;
     font-size: 1.1em;
+}
+@mixin focus-button {
+    &:focus {
+        outline: none;
+    }
+}
+.link-button {
+    border: none;
+    background-color: transparent;
+    font-family: "Special Elite", cursive;
+    font-size: 1em;
+    &:focus {
+        outline: none;
+    }
+    &:hover {
+        cursor: pointer;
+    }
+}
+.base-button {
+    @include focus-button;
+    margin: $margin-size-button;
+    transition-duration: 0.4s;
+    width: 200px;
+    background-color: transparent;
+    padding: 7px 5px 5px 5px;
+    font-size: 0.9em;
+    text-align: center;
+    text-decoration: none;
+    font-family: "Special Elite", cursive;
+}
+.green-button {
+    @extend .base-button;
+    &:hover {
+        color: white;
+        background-color: $blue;
+    }
+    border: 2px solid $blue;
+    color: $blue;
+}
+.red-button {
+    @extend .base-button;
+    &:hover {
+        color: white;
+        background-color: $red;
+    }
+    border: 2px solid $red;
+    color: $red;
 }
 .btn {
     &:focus {
@@ -111,58 +82,138 @@ $orientations: "HR", "VR";
     background-color: transparent;
     color: black;
     padding: 7px 5px 5px 5px;
-    // border: none;
     font-size: 0.9em;
     text-align: center;
     text-decoration: none;
     font-family: "Special Elite", cursive;
 }
-.opponent-select {
-    margin: $margin-size;
-}
-.status-bar {
-    margin-top: $margin-size;
+.selected-opponent {
+    text-decoration: underline;
+    text-decoration-color: $green;
+    font-style: italic;
 }
 
-.clues > * {
-    margin: 10px;
+// BOARD
+$cell-size: 41px;
+$cell-border: 1px;
+
+.board {
+    display: inline-block;
 }
-.disabled {
+.board-disabled {
     opacity: 0.25;
 }
-.green {
-    color: darkgreen;
+.board-table {
+    width: 10 * $cell-size + 11 * $cell-border;
+    height: 10 * $cell-size + 11 * $cell-border;
+    margin: $margin-size;
+    user-select: none;
+    border-collapse: collapse;
+    padding: 0;
 }
-.red {
-    color: red;
+.board-cell-content {
+    width: $cell-size;
+    height: $cell-size;
 }
-.blinking {
-    animation: blinker 1s linear infinite;
+.board-cell {
+    border: $cell-border solid grey;
+    padding: 0;
 }
 
-@keyframes blinker {
-    50% {
-        opacity: 0;
+// SHIPS AND SHOTS
+$ship-color: #00000033;
+$shot-miss-size: 5px;
+$orientations: "HR", "VR";
+
+@mixin ship-part-bg {
+    background-image: linear-gradient(
+        45deg,
+        transparent 35.71%,
+        $blue 35.71%,
+        $blue 50%,
+        transparent 50%,
+        transparent 85.71%,
+        $blue 85.71%,
+        $blue 100%
+    );
+    background-size: 6.9px 6.9px;
+}
+.ship-part {
+    @include ship-part-bg;
+    height: inherit;
+    width: inherit;
+}
+.shot-miss {
+    background-color: $blue;
+    width: $shot-miss-size;
+    height: $shot-miss-size;
+    border-radius: 50%;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.shot-hit {
+    width: inherit;
+    height: inherit;
+    background-image: linear-gradient(
+        45deg,
+        transparent 35.71%,
+        $red 35.71%,
+        $red 50%,
+        transparent 50%,
+        transparent 85.71%,
+        $red 85.71%,
+        $red 100%
+    );
+    background-size: 6.9px 6.9px;
+}
+@for $length from 1 through 5 {
+    @each $orientation in $orientations {
+        .ship-#{$orientation}-#{$length} {
+            @include ship-part-bg;
+            z-index: 2;
+            position: absolute;
+
+            $lw: if($orientation== "HR", $length, 1);
+            $lh: if($orientation== "VR", $length, 1);
+
+            width: $cell-size * $lw + $cell-border * $lw;
+            height: $cell-size * $lh + $cell-border * $lh;
+            // background: $ship-color;
+        }
     }
 }
-.op-btn {
-    border: none;
-    background-color: transparent;
-    font-family: "Special Elite", cursive;
-    font-size: 1em;
-    &:focus {
-        outline: none;
-    }
-    &:hover {
-        cursor: pointer;
-    }
-    &-leave {
-        @extend .op-btn;
-        margin-top: 30px;
-        color: red;
-    }
+
+// GAME STATUS
+@mixin game-status {
+    padding: 10px 0 5px 0;
+    color: white;
 }
-.selected {
+.waiting-for-opponent {
+    @include game-status;
+    background-color: $blue;
+}
+.you-won {
+    @include game-status;
+    background-color: $green;
+}
+.you-lost,
+.opponent-left {
+    @include game-status;
+    background-color: $red;
+}
+.status-turn {
     text-decoration: underline;
     font-style: italic;
+}
+.link-for-a-friend {
+    @include game-status;
+    background-color: $orange;
+    margin: $margin-size 0 0 -$margin-size-button;
+}
+.link-itself{
+    text-decoration: underline;
+    font-style: italic;
+    cursor: pointer;
 }

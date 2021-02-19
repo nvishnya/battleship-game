@@ -1,20 +1,16 @@
 <template>
-  <div class="status-bar">
-    <p v-if="!waiting && !isOver && !opponentLeft">
-      It's
-      <span class="green">
-        {{ yourTurn ? "your" : "opponent's" }}
-      </span>
-      turn.
+  <div class="">
+    <p v-if="!waiting && !isOver && !opponentLeft" class="waiting-for-opponent">
+      It's {{ yourTurn ? "YOUR" : "OPPONENT'S"}} turn.
     </p>
-    <p v-if="waiting" class="blinking green">Waiting for an opponent.</p>
+    <p v-if="waiting" class="waiting-for-opponent">Waiting for an opponent.</p>
     <p v-if="isOver">
       Game over.
-      <span :class="youWon ? 'green' : 'red'">
+      <span :class="youWon ? 'you-won' : 'you-lost'">
         You {{ youWon ? "won!" : "lost!" }}
       </span>
     </p>
-    <p v-if="opponentLeft && !isOver" class="red">
+    <p v-if="opponentLeft && !isOver" class="opponent-left">
       Opponent has left the game.
     </p>
   </div>

@@ -6,33 +6,30 @@
         opponent:
         <template v-if="gameId == null">
           <button
-            :class="{ selected: friendAsOpponent == false }"
-            class="op-btn"
+            :class="{ 'selected-opponent': friendAsOpponent == false }"
+            class="link-button"
             @click="createGameWithRandomOpponent"
           >
             random</button
           >/
         </template>
         <button
-          :class="{ selected: friendAsOpponent == true }"
-          class="op-btn"
+          :class="{ 'selected-opponent': friendAsOpponent == true }"
+          class="link-button"
           @click="createGameWithFriendOpponent"
         >
           friend
         </button>
       </div>
       <div>
-        <button class="btn" @click="startGame">start</button>
+        <button class="green-button" @click="startGame">start</button>
       </div>
     </template>
 
-    <div
-      v-if="friendAsOpponent && shipsPlaced && !gameStarted"
-      :style="{ marginTop: '25px' }"
-    >
-      <div>send this link to your frined:</div>
-      <div @click="copyLink" :style="{ color: 'blue', marginTop: '10px' }">
-        [{{ link }}]
+    <div v-if="friendAsOpponent && shipsPlaced && !gameStarted">
+      <div class="link-for-a-friend">
+        send this link to your frined:
+        <span @click="copyLink" class="link-itself">{{ link }}</span>
       </div>
     </div>
 
@@ -55,12 +52,7 @@
         :waiting="!gameStarted && shipsPlaced"
       />
       <div>
-        <button
-          class="op-btn-leave"
-          @click="leaveGame"
-        >
-          leave game
-        </button>
+        <button class="red-button" @click="leaveGame">leave game</button>
       </div>
     </template>
   </div>
@@ -121,7 +113,7 @@ export default {
       "onSocketMessage",
       "updateGame",
       "startGame",
-      "leaveGame"
+      "leaveGame",
     ]),
     onGameUpdate(event) {
       let data = JSON.parse(event.data);
