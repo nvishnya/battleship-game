@@ -29,7 +29,7 @@ html {
 #app > * {
     text-align: center;
     font-family: "Special Elite", cursive !important;
-    font-size: 1.1em;
+    font-size: 1.2em;
 }
 @mixin focus-button {
     &:focus {
@@ -55,7 +55,7 @@ html {
     width: $board-size;
     background-color: transparent;
     padding: 7px 5px 5px 5px;
-    font-size: 0.9em;
+    font-size: 1.1em;
     text-align: center;
     text-decoration: none;
     font-family: "Special Elite", cursive;
@@ -92,7 +92,7 @@ html {
     background-color: transparent;
     color: black;
     padding: 7px 5px 5px 5px;
-    font-size: 0.9em;
+    font-size: 1.1em;
     text-align: center;
     text-decoration: none;
     font-family: "Special Elite", cursive;
