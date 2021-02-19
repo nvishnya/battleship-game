@@ -5,9 +5,19 @@ $green: seagreen;
 $blue: cadetblue;
 $orange: darkorange;
 
-// MAIN
 $margin-size: 21px;
 $margin-size-button: 11px;
+
+$cell-size: 41px;
+$cell-border: 1px;
+
+$board-size: 10 * $cell-size + 11 * $cell-border;
+
+$ship-color: #00000033;
+$shot-miss-size: 5px;
+$orientations: "HR", "VR";
+
+// MAIN
 
 html {
     min-width: fit-content;
@@ -42,7 +52,7 @@ html {
     @include focus-button;
     margin: $margin-size-button;
     transition-duration: 0.4s;
-    width: 200px;
+    width: $board-size;
     background-color: transparent;
     padding: 7px 5px 5px 5px;
     font-size: 0.9em;
@@ -89,13 +99,11 @@ html {
 }
 .selected-opponent {
     text-decoration: underline;
-    text-decoration-color: $green;
+    text-decoration-color: $orange;
     font-style: italic;
 }
 
 // BOARD
-$cell-size: 41px;
-$cell-border: 1px;
 
 .board {
     display: inline-block;
@@ -104,8 +112,8 @@ $cell-border: 1px;
     opacity: 0.25;
 }
 .board-table {
-    width: 10 * $cell-size + 11 * $cell-border;
-    height: 10 * $cell-size + 11 * $cell-border;
+    width: $board-size;
+    height: $board-size;
     margin: $margin-size;
     user-select: none;
     border-collapse: collapse;
@@ -121,9 +129,6 @@ $cell-border: 1px;
 }
 
 // SHIPS AND SHOTS
-$ship-color: #00000033;
-$shot-miss-size: 5px;
-$orientations: "HR", "VR";
 
 @mixin ship-part-bg {
     background-image: linear-gradient(
@@ -144,7 +149,7 @@ $orientations: "HR", "VR";
     width: inherit;
 }
 .shot-miss {
-    background-color: $blue;
+    background-color: $green;
     width: $shot-miss-size;
     height: $shot-miss-size;
     border-radius: 50%;
