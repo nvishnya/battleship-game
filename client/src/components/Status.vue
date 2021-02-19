@@ -1,14 +1,11 @@
 <template>
   <div class="">
     <p v-if="!waiting && !isOver && !opponentLeft" class="waiting-for-opponent">
-      It's {{ yourTurn ? "YOUR" : "OPPONENT'S"}} turn.
+      It's {{ yourTurn ? "YOUR" : "OPPONENT'S" }} turn.
     </p>
     <p v-if="waiting" class="waiting-for-opponent">Waiting for an opponent.</p>
-    <p v-if="isOver">
-      Game over.
-      <span :class="youWon ? 'you-won' : 'you-lost'">
-        You {{ youWon ? "won!" : "lost!" }}
-      </span>
+    <p v-if="isOver" :class="youWon ? 'you-won' : 'you-lost'">
+      Game over. You {{ youWon ? "won!" : "lost!" }}
     </p>
     <p v-if="opponentLeft && !isOver" class="opponent-left">
       Opponent has left the game.
@@ -23,7 +20,14 @@ export default {
     waiting: Boolean,
   },
   computed: {
-    ...mapState(["shipsPlaced", "gameStarted", "yourTurn", "isOver", "youWon", "opponentLeft"]),
+    ...mapState([
+      "shipsPlaced",
+      "gameStarted",
+      "yourTurn",
+      "isOver",
+      "youWon",
+      "opponentLeft",
+    ]),
   },
 };
 </script>
