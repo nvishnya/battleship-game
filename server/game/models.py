@@ -7,19 +7,22 @@ from scipy import signal
 import numpy as np
 
 
+def delete_if_exists(model, attribute, value):
+    queryset = model.objects.filter(**{attribute: value})
+    if queryset.count() != 0:
+        queryset[0].delete()
+        return True
+    return False
+
+
 class Player(models.Model):
     channel_name = models.CharField(max_length=125)
     is_busy = models.BooleanField(default=False)
 
     def leave_game(self, game_id=None):
         self.set_busy(False)
-#         REMOVE DUPLICATIONS
-        board_temp = Board.objects.filter(player=self)
-        if board_temp.count() != 0:
-            board_temp[0].delete()
-        game_temp = Game.objects.filter(id=game_id)
-        if game_temp.count() != 0:
-            game_temp[0].delete()
+        delete_if_exists(Board, 'player', self)
+        delete_if_exists(Game, 'id', game_id)
 
     @staticmethod
     def create(channel_name):
