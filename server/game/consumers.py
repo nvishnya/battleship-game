@@ -37,7 +37,8 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             await self.leave()
 
     async def start(self, ships, friend_as_opponent, game_to_join_id):
-        if game_to_join_id is not None and not can_game_be_joined(game_to_join_id):
+        if game_to_join_id is not None and not await can_game_be_joined(game_to_join_id):
+            await self.send_json({'type': 'game.invalid'})
             return
         await place_ships(self.player_id, ships)
         if friend_as_opponent:
@@ -88,13 +89,14 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         })
 
     async def leave(self):
-        await self.channel_layer.group_discard(
-            self.game_group,
-            self.channel_name,
-        )
-        await self.channel_layer.group_send(self.game_group, {
-            'type': 'game.leave'
-        })
+        if self.game_id is not None:
+            await self.channel_layer.group_discard(
+                self.game_group,
+                self.channel_name,
+            )
+            await self.channel_layer.group_send(self.game_group, {
+                'type': 'game.leave'
+            })
         await leave_game(self.player_id, self.game_id)
         self.update_game_info(None)
 

@@ -10,9 +10,9 @@ def get_game_and_player(game_id, player_id):
 
 
 @database_sync_to_async
-def can_game_be_joined(self, game_id):
-    temp = Game.objects.filter(id=game_id, started=False)
-    if temp.count != 0:
+def can_game_be_joined(game_id):
+    temp = Game.objects.filter(id=game_id)
+    if temp.count() != 0:
         return True
     return False
 
@@ -70,6 +70,7 @@ def shoot_at(x, y, game_id, player_id):
 @database_sync_to_async
 def delete_player(player_id):
     Player.objects.get(id=player_id).delete()
+
 
 @database_sync_to_async
 def leave_game(player_id, game_id=None):
