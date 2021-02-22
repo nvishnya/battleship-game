@@ -1,6 +1,8 @@
 <template>
   <div id="app">
-    <div id="app-title">battleship.</div>
+    <div id="app-title">
+      <span>battleship.</span>
+    </div>
     <router-view />
   </div>
 </template>

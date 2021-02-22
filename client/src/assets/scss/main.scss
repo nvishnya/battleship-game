@@ -26,6 +26,18 @@ html {
     margin-top: $margin-size;
     font-size: 1.3em !important;
 }
+#app-title span {
+    position: relative;
+}
+#app-title span:before {
+    content: "";
+    position: absolute;
+    top: 100%;
+    width: 100%;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, rgba(100, 181, 184, 1) 50%, rgba(255, 140, 0, 1) 50%);
+}
 #app > * {
     text-align: center;
     font-family: "Special Elite", cursive !important;
@@ -217,7 +229,7 @@ html {
     background-color: $orange;
     margin: $margin-size 0 0 -$margin-size-button;
 }
-.link-itself{
+.link-itself {
     text-decoration: underline;
     font-style: italic;
     cursor: pointer;
