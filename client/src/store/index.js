@@ -18,7 +18,8 @@ const initialState = {
   yourTurn: false,
   board: [],
   shots: [],
-  opponent: []
+  opponent: [],
+  gameIsInvalid: false
 }
 
 const mutate = (state, prop, value) => {
@@ -43,6 +44,7 @@ export default new Vuex.Store({
     placeShips: (state) => { mutate(state, "shipsPlaced", true) },
     setGameId: (state, id) => { mutate(state, "gameId", id) },
     opponentLeft: (state) => { mutate(state, "opponentLeft", true) },
+    gameIsInvalid: (state) => { mutate(state, "gameIsInvalid", true) },
     updateBoard: (state, board) => { mutate(state, "board", JSON.parse(board)) },
     updateShots: (state, shots) => { mutate(state, "shots", JSON.parse(shots)) },
     updateOpponent: (state, opponent) => { mutate(state, "opponent", JSON.parse(opponent)) },
@@ -130,6 +132,8 @@ export default new Vuex.Store({
       }
       else if (data.action == "game.leave") {
         commit("opponentLeft")
+      } else if (data.type == "game.invalid") {
+        commit("gameIsInvalid")
       }
     },
 
@@ -142,14 +146,19 @@ export default new Vuex.Store({
       dispatch("sendSocketMessage", payload);
     },
 
+    resetGame({ commit, dispatch }) {
+      commit("reset");
+      dispatch("randomizeShips");
+      router.push({ name: "Game" });
+    },
+
     leaveGame({ state, commit, dispatch }) {
       let payload = {
         action: 'leave'
       }
       dispatch("sendSocketMessage", payload);
-      commit("reset");
-      dispatch("randomizeShips");
-      router.push({ name: "Game" });
+      dispatch("resetGame")
     },
+
   },
 });
