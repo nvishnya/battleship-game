@@ -22,7 +22,7 @@
         </button>
       </div>
       <div>
-        <button class="green-button" @click="startGame">start</button>
+        <button class="orange-button" @click="startGame">start</button>
       </div>
     </template>
 

@@ -2,15 +2,20 @@
   <div
     v-if="shots"
     :class="[
-      waiting || isOver || opponentLeft || ((!yours && !yourTurn) || (yours && yourTurn)) ? 'board-disabled' : '',
-      ,
       yours ? 'you' : 'opponent',
       'board',
+      waiting ||
+      isOver ||
+      opponentLeft ||
+      (!yours && !yourTurn) ||
+      (yours && yourTurn)
+        ? 'board-disabled'
+        : '',
     ]"
   >
-    <div v-if="yours">your board</div>
-    <div v-else>opponent's board</div>
-    <table :class="['board-table']">
+    <div class="board-owner" v-if="yours">YOUR BOARD</div>
+    <div class="board-owner" v-else>OPPONENT'S BOARD</div>
+    <table class="board-table">
       <tbody>
         <tr v-for="(_, x) in rows" :key="x">
           <td

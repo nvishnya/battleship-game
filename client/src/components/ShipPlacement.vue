@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="board" class="board">
-      <table class="board-table">
+      <table class="board-table board-table-placement">
         <tbody>
           <tr v-for="(_, row) in rows" :key="row">
             <td v-for="(_, col) in cols" :key="col" class="board-cell">
@@ -31,7 +31,7 @@
       </table>
     </div>
     <div>
-      <button class="green-button" @click="randomizeShips">randomize</button>
+      <button class="blue-button" @click="randomizeShips">randomize</button>
     </div>
   </div>
 </template>

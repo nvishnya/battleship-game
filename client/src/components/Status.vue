@@ -1,6 +1,12 @@
 <template>
   <div class="">
-    <p v-if="!waiting && !isOver && !opponentLeft" class="waiting-for-opponent">
+    <p
+      v-if="!waiting && !isOver && !opponentLeft"
+      :class="[
+        'waiting-for-opponent',
+        !waiting && yourTurn ? 'your-turn' : 'opponents-turn',
+      ]"
+    >
       It's {{ yourTurn ? "YOUR" : "OPPONENT'S" }} turn.
     </p>
     <p v-if="waiting" class="waiting-for-opponent">Waiting for an opponent.</p>

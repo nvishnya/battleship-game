@@ -1,14 +1,14 @@
 @import url("https://fonts.googleapis.com/css2?family=Special+Elite&display=swap");
 // COLORS
-$red: tomato;
+$red: #ff6347;
 $green: seagreen;
-$blue: cadetblue;
-$orange: darkorange;
+$blue: #5f9ea0;
+$orange: #ff8c00;
 
 $margin-size: 21px;
 $margin-size-button: 11px;
 
-$cell-size: 41px;
+$cell-size: 35px;
 $cell-border: 1px;
 
 $board-size: 10 * $cell-size + 11 * $cell-border;
@@ -72,23 +72,36 @@ html {
     text-decoration: none;
     font-family: "Special Elite", cursive;
 }
-.green-button {
+.blue-button {
     @extend .base-button;
     &:hover {
-        color: white;
-        background-color: $blue;
+        color: $blue;
+        background-color: white;
     }
     border: 2px solid $blue;
-    color: $blue;
+    background-color: $blue;
+    color: white;
+}
+.orange-button {
+    @extend .base-button;
+    &:hover {
+        color: $orange;
+        background-color: white;
+    }
+    border: 2px solid $orange;
+    background-color: $orange;
+    color: white;
 }
 .red-button {
     @extend .base-button;
     &:hover {
-        color: white;
-        background-color: $red;
+        color: $red;
+        background-color: white;
     }
+    background-color: $red;
     border: 2px solid $red;
-    color: $red;
+    color: white;
+    margin-top: $margin-size;
 }
 .btn {
     &:focus {
@@ -136,24 +149,27 @@ html {
     height: $cell-size;
 }
 .board-cell {
-    border: $cell-border solid grey;
+    border: $cell-border solid rgb(32, 32, 32);
     padding: 0;
 }
+.board-table-placement {
+    box-shadow: $margin-size $margin-size 0px 2px $orange;
+}
 
+.you > .board-table {
+    box-shadow: -$margin-size 0-$margin-size 0px 2px $orange;
+}
+.opponent > .board-table {
+    box-shadow: $margin-size $margin-size 0px 2px $blue;
+}
+.board-owner {
+    padding-bottom: $margin-size / 2;
+}
 // SHIPS AND SHOTS
 
 @mixin ship-part-bg {
-    background-image: linear-gradient(
-        45deg,
-        transparent 35.71%,
-        $blue 35.71%,
-        $blue 50%,
-        transparent 50%,
-        transparent 85.71%,
-        $blue 85.71%,
-        $blue 100%
-    );
-    background-size: 6.9px 6.9px;
+    background: url("./assets/diagonal-stripes.svg") repeat;
+    background-size: ($cell-size + 1px)/4;
 }
 .ship-part {
     @include ship-part-bg;
@@ -171,19 +187,10 @@ html {
     transform: translate(-50%, -50%);
 }
 .shot-hit {
+    @include ship-part-bg;
+    filter: invert(54%) sepia(35%) saturate(6222%) hue-rotate(334deg) brightness(109%) contrast(101%);
     width: inherit;
     height: inherit;
-    background-image: linear-gradient(
-        45deg,
-        transparent 35.71%,
-        $red 35.71%,
-        $red 50%,
-        transparent 50%,
-        transparent 85.71%,
-        $red 85.71%,
-        $red 100%
-    );
-    background-size: 6.9px 6.9px;
 }
 @for $length from 1 through 5 {
     @each $orientation in $orientations {
@@ -195,9 +202,8 @@ html {
             $lw: if($orientation== "HR", $length, 1);
             $lh: if($orientation== "VR", $length, 1);
 
-            width: $cell-size * $lw + $cell-border * $lw;
-            height: $cell-size * $lh + $cell-border * $lh;
-            // background: $ship-color;
+            width: $cell-size * $lw + $cell-border * $lw -1;
+            height: $cell-size * $lh + $cell-border * $lh -1;
         }
     }
 }
@@ -208,6 +214,14 @@ html {
     color: white;
 }
 .waiting-for-opponent {
+    @include game-status;
+    background-color: $green;
+}
+.your-turn {
+    @include game-status;
+    background-color: $orange;
+}
+.opponents-turn {
     @include game-status;
     background-color: $blue;
 }
