@@ -149,7 +149,9 @@ export default new Vuex.Store({
     resetGame({ commit, dispatch }) {
       commit("reset");
       dispatch("randomizeShips");
-      router.push({ name: "Game" });
+      if (router.history.current.path != '/') {
+        router.push({ name: "Game" });
+      }
     },
 
     leaveGame({ state, commit, dispatch }) {
