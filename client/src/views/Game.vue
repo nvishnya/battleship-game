@@ -1,7 +1,7 @@
 <template>
   <div>
     <Modal v-if="gameIsInvalid">
-      <div>Sorry, this game is invalid.</div>
+      <div>Sorry, this game is unavailable.</div>
       <button @click="resetGame" class="blue-button modal-button">OK</button>
     </Modal>
     <div class="game">
@@ -97,6 +97,7 @@ export default {
       "shots",
       "opponent",
       "yourTurn",
+      "opponentLeft",
 
       "shipsPlaced",
       "gameStarted",
@@ -113,7 +114,9 @@ export default {
     this.$store.dispatch("initSocket", {
       handler: this.onGameUpdate,
     });
+    window.addEventListener("beforeunload", this.beforeWindowUnload);
   },
+
   methods: {
     ...mapActions([
       "createGameWithFriendOpponent",
@@ -124,6 +127,14 @@ export default {
       "leaveGame",
       "resetGame",
     ]),
+    beforeWindowUnload(event) {
+      if (this.gameStarted && !this.opponentLeft) {
+        event.preventDefault();
+        event.returnValue = "";
+        console.log(event);
+        return null;
+      }
+    },
     onGameUpdate(event) {
       let data = JSON.parse(event.data);
       this.onSocketMessage(data);
