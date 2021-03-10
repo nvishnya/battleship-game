@@ -131,7 +131,6 @@ export default {
       if (this.gameStarted && !this.opponentLeft) {
         event.preventDefault();
         event.returnValue = "";
-        console.log(event);
         return null;
       }
     },
