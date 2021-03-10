@@ -22,41 +22,40 @@ export function isPlacementPossible(board, ship, maxX, maxY) {
     for (let i = ship.x - 1; i < ship.x + ship.rows + 1; i++) {
       for (let j = ship.y - 1; j < ship.y + ship.cols + 1; j++) {
         if (!isXYinRange(i, j, maxY, maxY)) {
-          continue
+          continue;
         }
         if (board[i][j] != 0) {
-          return false
+          return false;
         }
       }
     }
-    return true
+    return true;
   }
-  return false
+  return false;
 }
 export function placeShips(rows, cols, ships) {
   let board = zeros(rows, cols, 0);
   ships.forEach(ship => {
     for (let i = ship.x; i < ship.x + ship.rows; i++) {
       for (let j = ship.y; j < ship.y + ship.cols; j++) {
-        board[i][j] = ship.length
+        board[i][j] = ship.length;
       }
     }
   });
-  return board
+  return board;
 }
 
 function isXYinRange(x, y, maxX, maxY) {
-  return (x >= 0 && y >= 0 && x < maxX && y < maxY)
+  return x >= 0 && y >= 0 && x < maxX && y < maxY;
 }
 
 function isShipInRange(ship, maxX, maxY) {
   for (let i = 0; i < ship.rows; i++) {
     for (let j = 0; j < ship.cols; j++) {
-      if (!isXYinRange(ship.x + i, ship.y + j, maxX, maxY))
-        return false
+      if (!isXYinRange(ship.x + i, ship.y + j, maxX, maxY)) return false;
     }
   }
-  return true
+  return true;
 }
 
 export function getOffset(event) {
@@ -64,13 +63,13 @@ export function getOffset(event) {
   let size = path[2].clientWidth; // + clientTop / + clientLeft
   let offsetRow = Math.floor(event.offsetY / size);
   let offsetCol = Math.floor(event.offsetX / size);
-  return [offsetRow, offsetCol]
+  return [offsetRow, offsetCol];
 }
 
 export function getTempShipsAndNewShip(ships, shipIndex) {
   let tempShips = _.cloneDeep(ships);
   let ship = tempShips.splice(shipIndex, 1)[0];
-  return [tempShips, ship]
+  return [tempShips, ship];
 }
 
 export function getNewOrientation(oldOrientation) {
@@ -78,13 +77,12 @@ export function getNewOrientation(oldOrientation) {
 }
 
 export function flipMatrix(matrix) {
-  return matrix[0].map((column, index) => matrix.map((row) => row[index]));
-
+  return matrix[0].map((column, index) => matrix.map(row => row[index]));
 }
 
 export function rotateMatrix(matrix) {
-  matrix = _.cloneDeep(matrix)
-  return flipMatrix(matrix.reverse())
+  matrix = _.cloneDeep(matrix);
+  return flipMatrix(matrix.reverse());
 }
 
 export function getDifference(length, offset) {

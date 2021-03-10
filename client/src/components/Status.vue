@@ -4,7 +4,7 @@
       v-if="!waiting && !isOver && !opponentLeft"
       :class="[
         'waiting-for-opponent',
-        !waiting && yourTurn ? 'your-turn' : 'opponents-turn',
+        !waiting && yourTurn ? 'your-turn' : 'opponents-turn'
       ]"
     >
       It's {{ yourTurn ? "YOUR" : "OPPONENT'S" }} turn.
@@ -23,7 +23,7 @@
 import { mapState } from "vuex";
 export default {
   props: {
-    waiting: Boolean,
+    waiting: Boolean
   },
   computed: {
     ...mapState([
@@ -32,8 +32,8 @@ export default {
       "yourTurn",
       "isOver",
       "youWon",
-      "opponentLeft",
-    ]),
-  },
+      "opponentLeft"
+    ])
+  }
 };
 </script>

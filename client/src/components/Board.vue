@@ -10,7 +10,7 @@
       (!yours && !yourTurn) ||
       (yours && yourTurn)
         ? 'board-disabled'
-        : '',
+        : ''
     ]"
   >
     <div class="board-owner" v-if="yours">YOUR BOARD</div>
@@ -24,7 +24,7 @@
             class="board-cell"
             :class="{
               'board-cell-hit': shots[x][y] == 2,
-              'board-cell-ship-part': board[x][y] != 0,
+              'board-cell-ship-part': board[x][y] != 0
             }"
           >
             <div
@@ -40,7 +40,7 @@
                 :class="{
                   'ship-part': board[x][y] != 0 && shots[x][y] != 2,
                   'shot-miss': shots[x][y] == 1,
-                  'shot-hit': shots[x][y] == 2,
+                  'shot-hit': shots[x][y] == 2
                 }"
               >
                 &nbsp;
@@ -63,13 +63,13 @@ export default {
     shots: Array,
     yours: Boolean,
 
-    waiting: Boolean,
+    waiting: Boolean
   },
   computed: {
-    ...mapState(["isOver", "opponentLeft", "yourTurn"]),
+    ...mapState(["isOver", "opponentLeft", "yourTurn"])
   },
   methods: {
-    ...mapActions(["makeMove"]),
-  },
+    ...mapActions(["makeMove"])
+  }
 };
 </script>

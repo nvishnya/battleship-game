@@ -20,11 +20,11 @@ const initialState = {
   shots: [],
   opponent: [],
   gameIsInvalid: false
-}
+};
 
 const mutate = (state, prop, value) => {
   state[prop] = value;
-}
+};
 
 export default new Vuex.Store({
   state: {
@@ -34,52 +34,84 @@ export default new Vuex.Store({
     handler: null,
 
     rows: 10,
-    cols: 10,
+    cols: 10
   },
 
   mutations: {
-    updateShips: (state, ships) => { mutate(state, "ships", ships) },
-    setOpponent: (state, friend) => { mutate(state, "friendAsOpponent", friend) },
-    startGame: (state) => { mutate(state, "gameStarted", true) },
-    placeShips: (state) => { mutate(state, "shipsPlaced", true) },
-    setGameId: (state, id) => { mutate(state, "gameId", id) },
-    opponentLeft: (state) => { mutate(state, "opponentLeft", true) },
-    gameIsInvalid: (state) => { mutate(state, "gameIsInvalid", true) },
-    updateBoard: (state, board) => { mutate(state, "board", JSON.parse(board)) },
-    updateShots: (state, shots) => { mutate(state, "shots", JSON.parse(shots)) },
-    updateOpponent: (state, opponent) => { mutate(state, "opponent", JSON.parse(opponent)) },
-    updateCurrentTurn: (state, yourTurn) => { mutate(state, "yourTurn", yourTurn) },
-    updateGameStatus: (state, isOver) => { mutate(state, "isOver", isOver) },
-    updateGameWinner: (state, youWon) => { mutate(state, "youWon", youWon) },
-    updateSocket: (state, url) => { mutate(state, "socket", new WebSocket(url)) },
-    closeSocket: (state) => { state.socket.close() },
-    reset: (state) => { Object.assign(state, initialState) },
+    updateShips: (state, ships) => {
+      mutate(state, "ships", ships);
+    },
+    setOpponent: (state, friend) => {
+      mutate(state, "friendAsOpponent", friend);
+    },
+    startGame: state => {
+      mutate(state, "gameStarted", true);
+    },
+    placeShips: state => {
+      mutate(state, "shipsPlaced", true);
+    },
+    setGameId: (state, id) => {
+      mutate(state, "gameId", id);
+    },
+    opponentLeft: state => {
+      mutate(state, "opponentLeft", true);
+    },
+    gameIsInvalid: state => {
+      mutate(state, "gameIsInvalid", true);
+    },
+    updateBoard: (state, board) => {
+      mutate(state, "board", JSON.parse(board));
+    },
+    updateShots: (state, shots) => {
+      mutate(state, "shots", JSON.parse(shots));
+    },
+    updateOpponent: (state, opponent) => {
+      mutate(state, "opponent", JSON.parse(opponent));
+    },
+    updateCurrentTurn: (state, yourTurn) => {
+      mutate(state, "yourTurn", yourTurn);
+    },
+    updateGameStatus: (state, isOver) => {
+      mutate(state, "isOver", isOver);
+    },
+    updateGameWinner: (state, youWon) => {
+      mutate(state, "youWon", youWon);
+    },
+    updateSocket: (state, url) => {
+      mutate(state, "socket", new WebSocket(url));
+    },
+    closeSocket: state => {
+      state.socket.close();
+    },
+    reset: state => {
+      Object.assign(state, initialState);
+    },
     addListeners: (state, handler) => {
       state.handler = handler;
       state.socket.onmessage = handler;
-    },
+    }
   },
 
   actions: {
     initSocket({ commit, dispatch }, payload) {
       // commit('updateSocket', 'ws://localhost:8000/ws/')
-      commit('updateSocket', 'ws://' + window.location.hostname + ':8000/ws/')
+      commit("updateSocket", "ws://" + window.location.hostname + ":8000/ws/");
       commit("addListeners", payload.handler);
       dispatch("randomizeShips");
       let gameId = router.currentRoute.params.id;
       gameId = gameId == undefined ? null : gameId;
       let friend = gameId == null ? false : true;
-      commit("setOpponent", friend)
-      commit("setGameId", gameId)
+      commit("setOpponent", friend);
+      commit("setGameId", gameId);
     },
 
-    async createGameWithFriendOpponent({ dispatch, commit, state }) {
+    async createGameWithFriendOpponent({ commit, state }) {
       if (!state.friendAsOpponent) {
         commit("setOpponent", true);
       }
     },
 
-    createGameWithRandomOpponent({ dispatch, state, commit }) {
+    createGameWithRandomOpponent({ state, commit }) {
       if (state.friendAsOpponent) {
         commit("setOpponent", false);
       }
@@ -96,7 +128,7 @@ export default new Vuex.Store({
       commit("updateShips", response.data);
     },
 
-    startGame({ state, dispatch, commit }) {
+    startGame({ state, dispatch }) {
       let payload = {
         action: "start",
         ships: state.ships,
@@ -107,33 +139,34 @@ export default new Vuex.Store({
     },
 
     updateGame({ commit }, data) {
-      commit("updateBoard", data.you.board)
-      commit("updateShots", data.you.shots)
-      commit("updateOpponent", data.opponent.shots)
-      commit("updateCurrentTurn", data.your_turn)
-      commit("updateGameStatus", data.is_over)
-      commit("updateGameWinner", data.you_won)
+      commit("updateBoard", data.you.board);
+      commit("updateShots", data.you.shots);
+      commit("updateOpponent", data.opponent.shots);
+      commit("updateCurrentTurn", data.your_turn);
+      commit("updateGameStatus", data.is_over);
+      commit("updateGameWinner", data.you_won);
     },
 
     onSocketMessage({ commit, dispatch, state }, data) {
       if (data.action === "game.wait") {
-        commit("setGameId", data.game_id)
+        commit("setGameId", data.game_id);
         commit("placeShips");
-        commit("updateBoard", data.you.board)
-        commit("updateShots", data.you.shots)
-        commit("updateOpponent", JSON.stringify(zeros(state.rows, state.cols, 0)))
-      }
-      else if (data.action === "game.start") {
+        commit("updateBoard", data.you.board);
+        commit("updateShots", data.you.shots);
+        commit(
+          "updateOpponent",
+          JSON.stringify(zeros(state.rows, state.cols, 0))
+        );
+      } else if (data.action === "game.start") {
         commit("placeShips");
         commit("startGame");
-        dispatch("updateGame", data.game)
+        dispatch("updateGame", data.game);
       } else if (data.action === "game.update") {
-        dispatch("updateGame", data.game)
-      }
-      else if (data.action == "game.leave") {
-        commit("opponentLeft")
+        dispatch("updateGame", data.game);
+      } else if (data.action == "game.leave") {
+        commit("opponentLeft");
       } else if (data.type == "game.invalid") {
-        commit("gameIsInvalid")
+        commit("gameIsInvalid");
       }
     },
 
@@ -141,7 +174,7 @@ export default new Vuex.Store({
       payload = {
         action: "shoot",
         x: payload.x,
-        y: payload.y,
+        y: payload.y
       };
       dispatch("sendSocketMessage", payload);
     },
@@ -149,18 +182,17 @@ export default new Vuex.Store({
     resetGame({ commit, dispatch }) {
       commit("reset");
       dispatch("randomizeShips");
-      if (router.history.current.path != '/') {
+      if (router.history.current.path != "/") {
         router.push({ name: "Game" });
       }
     },
 
-    leaveGame({ state, commit, dispatch }) {
+    leaveGame({ dispatch }) {
       let payload = {
-        action: 'leave'
-      }
+        action: "leave"
+      };
       dispatch("sendSocketMessage", payload);
-      dispatch("resetGame")
-    },
-
-  },
+      dispatch("resetGame");
+    }
+  }
 });

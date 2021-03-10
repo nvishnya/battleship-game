@@ -18,7 +18,7 @@
                     getShipClassName(
                       ships[board[row][col]]['length'],
                       ships[board[row][col]]['orientation']
-                    ),
+                    )
                   ]"
                   draggable="true"
                   @dragstart="onDragStart($event, board[row][col])"
@@ -47,14 +47,14 @@ import {
   isPlacementPossible,
   placeShips,
   rotateMatrix,
-  zeros,
+  zeros
 } from "../helpers";
 var _ = require("lodash");
 
 export default {
   props: {
     rows: Number,
-    cols: Number,
+    cols: Number
   },
   computed: {
     ...mapState(["ships"]),
@@ -64,7 +64,7 @@ export default {
         board[this.ships[i].x][this.ships[i].y] = i;
       }
       return board;
-    },
+    }
   },
   methods: {
     ...mapActions(["randomizeShips"]),
@@ -150,7 +150,7 @@ export default {
       if (isPlacementPossible(currentBoard, ship, this.rows, this.cols)) {
         this.$set(this.ships, shipIndex, ship);
       }
-    },
-  },
+    }
+  }
 };
 </script>
