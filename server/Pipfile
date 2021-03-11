@@ -19,6 +19,7 @@ channels = "*"
 channels-redis = "*"
 twisted = {extras = ["http2", "tls"], version = "*"}
 daphne = "*"
+mysqlclient = "*"
 
 [requires]
 python_version = "3.8"
