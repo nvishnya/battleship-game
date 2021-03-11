@@ -17,6 +17,8 @@ django-picklefield = "*"
 djangorestframework = "*"
 channels = "*"
 channels-redis = "*"
+twisted = {extras = ["http2", "tls"], version = "*"}
+daphne = "*"
 
 [requires]
 python_version = "3.8"
