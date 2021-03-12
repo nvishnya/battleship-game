@@ -94,8 +94,7 @@ export default new Vuex.Store({
 
   actions: {
     initSocket({ commit, dispatch }, payload) {
-      // commit('updateSocket', 'ws://localhost:8000/ws/')
-      commit("updateSocket", "ws://" + window.location.hostname + ":8000/ws/");
+      commit("updateSocket", "wss://battleship-game-server.herokuapp.com:8000/ws/");
       commit("addListeners", payload.handler);
       dispatch("randomizeShips");
       let gameId = router.currentRoute.params.id;
@@ -123,7 +122,7 @@ export default new Vuex.Store({
 
     async randomizeShips({ state, commit }) {
       const response = await axios.get(
-        `random-board/?rows=${state.rows}&cols=${state.cols}`
+        `https://battleship-game-server.herokuapp.com/random-board/?rows=${state.rows}&cols=${state.cols}`
       );
       commit("updateShips", response.data);
     },
