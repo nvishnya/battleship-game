@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -103,15 +104,17 @@ CHANNEL_LAYERS = {
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
-    'default': os.environ.get('DATABASE_URL', {
+    'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'battleship-db',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': ''
-    })
+    }
 }
+db_from_env = dj_database_url.config()
+DATABASES['default'].update(db_from_env)
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators

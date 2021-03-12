@@ -21,6 +21,7 @@ twisted = {extras = ["http2", "tls"], version = "*"}
 daphne = "*"
 mysqlclient = "*"
 django-cors-headers = "*"
+dj-database-url = "*"
 
 [requires]
 python_version = "3.8"
