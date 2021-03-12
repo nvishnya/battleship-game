@@ -94,7 +94,7 @@ export default new Vuex.Store({
 
   actions: {
     initSocket({ commit, dispatch }, payload) {
-      commit("updateSocket", "wss://battleship-game-server.herokuapp.com:8000/ws/");
+      commit("updateSocket", "wss://battleship-game-server.herokuapp.com/ws/");
       commit("addListeners", payload.handler);
       dispatch("randomizeShips");
       let gameId = router.currentRoute.params.id;
