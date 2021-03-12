@@ -103,14 +103,14 @@ CHANNEL_LAYERS = {
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
+    'default': os.environ.get('DATABASE_URL', {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'battleship-db',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': ''
-    }
+    })
 }
 
 # Password validation
