@@ -20,6 +20,7 @@ channels-redis = "*"
 twisted = {extras = ["http2", "tls"], version = "*"}
 daphne = "*"
 mysqlclient = "*"
+django-cors-headers = "*"
 
 [requires]
 python_version = "3.8"
