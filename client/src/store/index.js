@@ -30,7 +30,7 @@ export default new Vuex.Store({
   state: {
     ...initialState,
 
-    socket: null,
+    socket: new WebSocket(process.env.VUE_APP_WEBSOCKET_URL),
     handler: null,
 
     rows: 10,
@@ -94,7 +94,6 @@ export default new Vuex.Store({
 
   actions: {
     initSocket({ commit, dispatch }, payload) {
-      commit("updateSocket", process.env.VUE_APP_WEBSOCKET_URL); //<-----------
       commit("addListeners", payload.handler);
       dispatch("randomizeShips");
       let gameId = router.currentRoute.params.id;
