@@ -8,26 +8,26 @@
       <template v-if="!shipsPlaced">
         <ShipPlacement :rows="rows" :cols="cols" />
         <div class="opponent-select">
-          opponent:
+          <div :style="{ 'margin-bottom': '5px' }">opponent type:</div>
           <template v-if="gameId == null">
             <button
               :class="{ 'selected-opponent': friendAsOpponent == false }"
-              class="link-button"
+              class="opponent-select-button"
               @click="createGameWithRandomOpponent"
             >
-              random</button
-            >/
+              random
+            </button>
+            <button
+              :class="{ 'selected-opponent': friendAsOpponent == true }"
+              class="opponent-select-button"
+              @click="createGameWithFriendOpponent"
+            >
+              friend
+            </button>
           </template>
-          <button
-            :class="{ 'selected-opponent': friendAsOpponent == true }"
-            class="link-button"
-            @click="createGameWithFriendOpponent"
-          >
-            friend
-          </button>
         </div>
         <div>
-          <button class="orange-button" @click="startGame">start</button>
+          <button class="blue-button" @click="startGame">start game</button>
         </div>
       </template>
 

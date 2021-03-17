@@ -136,11 +136,24 @@ html {
     font-family: "Special Elite", cursive;
 }
 .selected-opponent {
-    text-decoration: underline;
-    text-decoration-color: $orange;
-    font-style: italic;
+    background-color: $orange;
+    color: white !important;
 }
-
+.opponent-select-button {
+    @extend .base-button;
+    border: 2px solid $orange;
+    // background-color: $orange;
+    width: $board-size / 2;
+    // background-color: transparent;
+    color: $orange;
+    margin: 0;
+}
+.opponent-select {
+    margin: $margin-size / 3;
+}
+.opponent-select button:not(:last-child) {
+    border-right: none; /* Prevent double borders */
+}
 // BOARD
 
 .board {

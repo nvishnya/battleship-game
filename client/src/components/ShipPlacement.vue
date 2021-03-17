@@ -31,7 +31,9 @@
       </table>
     </div>
     <div>
-      <button class="blue-button" @click="randomizeShips">randomize</button>
+      <button class="blue-button" @click="randomizeShips">
+        randomize ships
+      </button>
     </div>
   </div>
 </template>
