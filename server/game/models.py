@@ -66,6 +66,10 @@ class Board(models.Model):
     shots = PickledObjectField()
 
     @property
+    def shot_ships(self):
+        return [ship for ship in self.ship_set.all() if not ship.is_alive]
+
+    @property
     def shots_with_marked(self):
         data = [model_to_dict(ship) for ship in self.ship_set.all() if not ship.is_alive]
         return Board._mark_surrounding_cells(self.shots, *data)

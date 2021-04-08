@@ -38,10 +38,11 @@ class YouSerializer(serializers.ModelSerializer):
 
 class OpponentSerializer(serializers.ModelSerializer):
     shots = NDarrayField(source='board.shots_with_marked')
-
+    shot_ships = ShipSerializer(source='board.shot_ships', many=True)
+    
     class Meta:
         model = Player
-        fields = ['shots']
+        fields = ['shots', 'shot_ships']
 
 
 class GameSerializer(serializers.ModelSerializer):
