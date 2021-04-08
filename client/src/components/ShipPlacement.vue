@@ -41,6 +41,7 @@
 <script>
 import { mapActions, mapState } from "vuex";
 import {
+  getBoard,
   getClicked,
   getDifference,
   getNewOrientation,
@@ -61,11 +62,7 @@ export default {
   computed: {
     ...mapState(["ships"]),
     board() {
-      let board = zeros(this.rows, this.cols, -1);
-      for (let i = 0; i < this.ships.length; i++) {
-        board[this.ships[i].x][this.ships[i].y] = i;
-      }
-      return board;
+      return getBoard(this.rows, this.cols, this.ships)
     }
   },
   methods: {

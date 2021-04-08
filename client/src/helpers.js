@@ -92,3 +92,11 @@ export function getDifference(length, offset) {
 export function getClicked(coord, offset) {
   return coord + offset;
 }
+
+export function getBoard(rows, cols, ships) {
+  let board = zeros(rows, cols, -1);
+  for (let i = 0; i < ships.length; i++) {
+    board[ships[i].x][ships[i].y] = i;
+  }
+  return board;
+}
