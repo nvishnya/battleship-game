@@ -95,3 +95,11 @@ $screen-width: 2 * $board-size + 4 * $margin-size + 15px;
         margin-left: $button-width + $margin-size * 2;
     }
 }
+.link-itself {
+    @include themify {
+        color: theme-based("opponent");
+    }
+    &:hover {
+        cursor: pointer;
+    }
+}
