@@ -43,7 +43,6 @@
   </div>
 </template>
 
-
 <script>
 import { mapActions, mapState } from "vuex";
 import { zeros, getBoard } from "../helpers";
@@ -58,12 +57,12 @@ export default {
     Status,
     Board,
     OpponentSelect,
-    GameIsInvalidModal,
+    GameIsInvalidModal
   },
   data() {
     return {
       dummyBoard: [],
-      showModal: false,
+      showModal: false
     };
   },
   computed: {
@@ -85,17 +84,17 @@ export default {
       "shipsPlaced",
       "gameStarted",
       "gameId",
-      "gameIsInvalid",
+      "gameIsInvalid"
       // "link",
     ]),
     link() {
       return document.URL + "join" + this.gameId;
-    },
+    }
   },
   created() {
     this.dummyBoard = zeros(this.rows, this.cols, 0);
     this.$store.dispatch("initSocket", {
-      handler: this.onGameUpdate,
+      handler: this.onGameUpdate
     });
     window.addEventListener("beforeunload", this.beforeWindowUnload);
   },
@@ -107,7 +106,7 @@ export default {
       "updateGame",
       "startGame",
       "leaveGame",
-      "resetGame",
+      "resetGame"
     ]),
     beforeWindowUnload(event) {
       if (this.gameStarted && !this.opponentLeft) {
@@ -123,7 +122,7 @@ export default {
     copyLink() {
       this.$clipboard(this.link);
       alert("Link was copied!");
-    },
-  },
+    }
+  }
 };
 </script>

@@ -1,37 +1,37 @@
 <template>
-    <div v-if="board" class="board ship-placement">
-      <table class="board-table">
-        <tbody>
-          <tr v-for="(_, row) in rows" :key="row">
-            <td v-for="(_, col) in cols" :key="col" class="board-cell">
+  <div v-if="board" class="board ship-placement">
+    <table class="board-table">
+      <tbody>
+        <tr v-for="(_, row) in rows" :key="row">
+          <td v-for="(_, col) in cols" :key="col" class="board-cell">
+            <div
+              class="board-cell-content"
+              @drop="onDrop($event, row, col)"
+              @dragenter.prevent
+              @dragover.prevent
+            >
+              &nbsp;
               <div
-                class="board-cell-content"
-                @drop="onDrop($event, row, col)"
-                @dragenter.prevent
-                @dragover.prevent
-              >
-                &nbsp;
-                <div
-                  v-if="board[row][col] != -1"
-                  :class="[
-                    getShipClassName(
-                      ships[board[row][col]]['length'],
-                      ships[board[row][col]]['orientation']
-                    )
-                  ]"
-                  draggable="true"
-                  @dragstart="onDragStart($event, board[row][col])"
-                  @click="rotate($event, board[row][col])"
-                ></div>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <button class="button-1" @click="randomizeShips">
-        randomize ships
-      </button>
-    </div>
+                v-if="board[row][col] != -1"
+                :class="[
+                  getShipClassName(
+                    ships[board[row][col]]['length'],
+                    ships[board[row][col]]['orientation']
+                  )
+                ]"
+                draggable="true"
+                @dragstart="onDragStart($event, board[row][col])"
+                @click="rotate($event, board[row][col])"
+              ></div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <button class="button-1" @click="randomizeShips">
+      randomize ships
+    </button>
+  </div>
 </template>
 
 <script>
@@ -58,7 +58,7 @@ export default {
   computed: {
     ...mapState(["ships"]),
     board() {
-      return getBoard(this.rows, this.cols, this.ships)
+      return getBoard(this.rows, this.cols, this.ships);
     }
   },
   methods: {

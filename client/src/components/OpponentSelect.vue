@@ -27,13 +27,13 @@
 import { mapActions, mapState } from "vuex";
 export default {
   computed: {
-    ...mapState(["gameId", "friendAsOpponent"]),
+    ...mapState(["gameId", "friendAsOpponent"])
   },
   methods: {
     ...mapActions([
       "createGameWithFriendOpponent",
-      "createGameWithRandomOpponent",
-    ]),
-  },
+      "createGameWithRandomOpponent"
+    ])
+  }
 };
 </script>

@@ -147,7 +147,7 @@ export default new Vuex.Store({
       commit("updateCurrentTurn", data.your_turn);
       commit("updateGameStatus", data.is_over);
       commit("updateGameWinner", data.you_won);
-      commit("updateOpponentShip", data.opponent.shot_ships)
+      commit("updateOpponentShip", data.opponent.shot_ships);
     },
 
     onSocketMessage({ commit, dispatch, state }, data) {

@@ -22,7 +22,7 @@
               <div
                 :class="{
                   'shot-miss': shots[x][y] == 1,
-                  'shot-hit': shots[x][y] == 2,
+                  'shot-hit': shots[x][y] == 2
                 }"
               ></div>
               <div
@@ -32,7 +32,7 @@
                         ships[board[x][y]]['length'],
                         ships[board[x][y]]['orientation']
                       )
-                    : '',
+                    : ''
                 ]"
               ></div>
             </div>
@@ -54,7 +54,7 @@ export default {
     shots: Array,
     yours: Boolean,
 
-    waiting: Boolean,
+    waiting: Boolean
   },
   computed: {
     ...mapState(["isOver", "opponentLeft", "yourTurn"]),
@@ -69,7 +69,7 @@ export default {
     },
     isActive() {
       return !(this.waiting || this.isOver || this.opponentLeft);
-    },
+    }
   },
   methods: {
     ...mapActions(["makeMove"]),
@@ -78,7 +78,7 @@ export default {
     },
     getShipClassName(length, orientation) {
       return `ship-${orientation}-${length}`;
-    },
-  },
+    }
+  }
 };
 </script>

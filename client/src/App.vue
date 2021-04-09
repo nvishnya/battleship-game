@@ -10,10 +10,10 @@
 
 <script>
 export default {
-  mounted(){
-    document.body.classList.add('theme-dark')
+  mounted() {
+    document.body.classList.add("theme-dark");
   }
-}
+};
 </script>
 
 <style lang="scss">

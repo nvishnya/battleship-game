@@ -13,7 +13,7 @@
 import { mapActions } from "vuex";
 export default {
   methods: {
-    ...mapActions(["resetGame"]),
-  },
+    ...mapActions(["resetGame"])
+  }
 };
 </script>
