@@ -17,6 +17,9 @@
         friend
       </button>
     </template>
+    <template v-else>
+      <button class="friend-selected button-1">friend</button>
+    </template>
   </div>
 </template>
 

@@ -65,11 +65,15 @@ body {
 }
 .button-1 {
     @include base-button("opponent");
-    &.selected-opponent {
-        @include themify {
+    @include themify {
+        &.selected-opponent,
+        &.friend-selected {
             color: black;
             background-color: theme-based("opponent");
         }
+    }
+    &.friend-selected {
+        width: $board-size !important;
     }
 }
 .leave-button {
