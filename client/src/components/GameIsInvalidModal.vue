@@ -3,7 +3,7 @@
     <div class="modal">
       <div class="modal-body">
         <div>Sorry, this game is unavailable.</div>
-        <button @click="resetGame" class="button-1">OK</button>
+        <button @click="resetGame" class="modal-button">OK</button>
       </div>
     </div>
   </div>
