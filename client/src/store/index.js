@@ -19,6 +19,7 @@ const initialState = {
   board: [],
   shots: [],
   opponent: [],
+  opponentShips: [],
   gameIsInvalid: false
 };
 
@@ -67,6 +68,9 @@ export default new Vuex.Store({
     },
     updateOpponent: (state, opponent) => {
       mutate(state, "opponent", JSON.parse(opponent));
+    },
+    updateOpponentShip: (state, opponentShips) => {
+      mutate(state, "opponentShips", opponentShips);
     },
     updateCurrentTurn: (state, yourTurn) => {
       mutate(state, "yourTurn", yourTurn);
@@ -143,6 +147,7 @@ export default new Vuex.Store({
       commit("updateCurrentTurn", data.your_turn);
       commit("updateGameStatus", data.is_over);
       commit("updateGameWinner", data.you_won);
+      commit("updateOpponentShip", data.opponent.shot_ships)
     },
 
     onSocketMessage({ commit, dispatch, state }, data) {

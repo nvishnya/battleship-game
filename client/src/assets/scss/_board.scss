@@ -1,0 +1,123 @@
+@import "_mixins.scss";
+@import "_color-palette";
+@import "_variables";
+
+.board {
+    display: inline-block;
+}
+
+$players: "you", "opponent";
+.board-table {
+    width: $board-size;
+    height: $board-size;
+    margin: $margin-size;
+    user-select: none;
+    border-collapse: collapse;
+    padding: 0;
+    @each $player in $players {
+        &.#{$player} .ship-part {
+            @include ship-part-background($player);
+        }
+        // &.#{$player} .shot-hit {
+        //     @include ship-part-background($player);
+        // }
+        @include themify {
+            &.#{$player} {
+                border: 3px solid theme-based($player);
+                &:not(.disabled) {
+                    box-shadow: 0 0 10px 5px theme-based($player);
+                }
+            }
+            &.#{$player} .shot-miss {
+                background-color: theme-based($player);
+            }
+        }
+        tr:nth-of-type(odd) td:nth-of-type(odd) {
+            background-color: #1f2733;
+        }
+
+        tr:nth-of-type(even) td:nth-of-type(even) {
+            background-color: #1f2733;
+        }
+    }
+}
+
+.ship-part {
+    width: inherit;
+    height: inherit;
+    position: relative;
+}
+.shot-miss {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.board-cell-content {
+    width: inherit;
+    height: inherit;
+    position: relative;
+}
+
+.board-cell {
+    padding: 0;
+    width: $cell-size;
+    height: $cell-size;
+    border: $cell-border solid transparent;
+}
+
+.shot-hit {
+    width: $cell-size;
+    height: $cell-size;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 3;
+    &:after {
+        position: relative;
+        vertical-align: -50%;
+        color: #fff;
+        font-size: $cell-size + 3px;
+        content: "\d7";
+        z-index: 33;
+    }
+}
+
+// move border to mixin --->
+.ship-placement {
+    & > .board-table {
+        @include themify {
+            border: 3px solid theme-based("you");
+            box-shadow: 0 0 10px 5px theme-based("you");
+        }
+    }
+}
+// <---
+
+$orientations: "HR", "VR";
+@for $length from 1 through 5 {
+    @each $orientation in $orientations {
+        @each $player in $players {
+            .#{$player} .ship-#{$orientation}-#{$length} {
+                @include ship-part-background($player);
+            }
+        }
+        .ship-#{$orientation}-#{$length} {
+            z-index: 2;
+            position: absolute;
+
+            $lw: if($orientation== "HR", $length, 1);
+            $lh: if($orientation== "VR", $length, 1);
+
+            width: $cell-size * $lw + $cell-border * $lw -1;
+            height: $cell-size * $lh + $cell-border * $lh -1;
+
+            border-radius: 2px;
+
+            @include ship-part-background("you")
+        }
+    }
+}

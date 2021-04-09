@@ -1,0 +1,42 @@
+.status {
+    text-decoration: underline;
+    text-underline-position: under;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 3px;
+}
+
+.status-waiting {
+    @extend .status;
+    @include themify {
+        color: theme-based("main-color");
+        text-decoration-color: theme-based("main-color");
+    }
+}
+.status-opponents-turn {
+    @extend .status;
+    @include themify {
+        color: theme-based("you");
+        text-decoration-color: theme-based("you");
+    }
+}
+.status-your-turn {
+    @extend .status;
+    @include themify {
+        color: theme-based("opponent");
+        text-decoration-color: theme-based("opponent");
+    }
+}
+.status-you-won {
+    @extend .status;
+    @include themify {
+        color: theme-based("win");
+        text-decoration-color: theme-based("win");
+    }
+}
+.status-you-lost {
+    @extend .status;
+    @include themify {
+        color: theme-based("lose");
+        text-decoration-color: theme-based("lose");
+    }
+}

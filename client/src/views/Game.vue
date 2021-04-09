@@ -1,87 +1,69 @@
 <template>
-  <div>
-    <Modal v-if="gameIsInvalid">
-      <div>Sorry, this game is unavailable.</div>
-      <button @click="resetGame" class="blue-button modal-button">OK</button>
-    </Modal>
-    <div class="game">
-      <template v-if="!shipsPlaced">
-        <ShipPlacement :rows="rows" :cols="cols" />
-        <div class="opponent-select">
-          <div :style="{ 'margin-bottom': '5px' }">opponent type:</div>
-          <template v-if="gameId == null">
-            <button
-              :class="{ 'selected-opponent': friendAsOpponent == false }"
-              class="opponent-select-button"
-              @click="createGameWithRandomOpponent"
-            >
-              random
-            </button>
-            <button
-              :class="{ 'selected-opponent': friendAsOpponent == true }"
-              class="opponent-select-button"
-              @click="createGameWithFriendOpponent"
-            >
-              friend
-            </button>
-          </template>
-        </div>
-        <div>
-          <button class="blue-button" @click="startGame">start game</button>
-        </div>
-      </template>
+  <div class="game-container">
+    <GameIsInvalidModal v-if="gameIsInvalid" />
+    <template v-if="!shipsPlaced">
+      <ShipPlacement :rows="rows" :cols="cols" />
+      <OpponentSelect />
+      <button class="button-1" @click="startGame">start game</button>
+    </template>
 
-      <div v-if="friendAsOpponent && shipsPlaced && !gameStarted">
-        <div class="link-for-a-friend">
-          send this link to your frined:
-          <span @click="copyLink" class="link-itself">{{ link }}</span>
-        </div>
+    <div v-if="friendAsOpponent && shipsPlaced && !gameStarted">
+      <div class="link-for-a-friend">
+        send this link to your frined:
+        <span @click="copyLink" class="link-itself">{{ link }}</span>
       </div>
-
-      <template v-if="shipsPlaced">
-        <Status :waiting="!gameStarted && shipsPlaced" />
-        <Board
-          :rows="rows"
-          :cols="cols"
-          :board="board"
-          :shots="shots"
-          :yours="true"
-          :waiting="false"
-        />
-        <Board
-          :rows="rows"
-          :cols="cols"
-          :board="dummyBoard"
-          :shots="opponent"
-          :yours="false"
-          :waiting="!gameStarted && shipsPlaced"
-        />
-        <div>
-          <button class="red-button" @click="leaveGame">leave game</button>
-        </div>
-      </template>
     </div>
+
+    <template v-if="shipsPlaced">
+      <Status :waiting="!gameStarted && shipsPlaced" />
+      <Board
+        :rows="rows"
+        :cols="cols"
+        :ships="ships"
+        :board="getBoard(rows, cols, ships)"
+        :shots="shots"
+        :yours="true"
+        :waiting="false"
+      />
+      <Board
+        :rows="rows"
+        :cols="cols"
+        :ships="opponentShips"
+        :board="getBoard(rows, cols, opponentShips)"
+        :shots="opponent"
+        :yours="false"
+        :waiting="!gameStarted && shipsPlaced"
+      />
+      <div>
+        <button class="button-1 leave-button" @click="leaveGame">
+          leave game
+        </button>
+      </div>
+    </template>
   </div>
 </template>
 
+
 <script>
 import { mapActions, mapState } from "vuex";
-import { zeros } from "../helpers";
+import { zeros, getBoard } from "../helpers";
 import ShipPlacement from "@/components/ShipPlacement.vue";
+import OpponentSelect from "@/components/OpponentSelect.vue";
 import Status from "@/components/Status.vue";
 import Board from "@/components/Board.vue";
-import Modal from "@/components/Modal.vue";
+import GameIsInvalidModal from "@/components/GameIsInvalidModal.vue";
 export default {
   components: {
     ShipPlacement,
     Status,
     Board,
-    Modal
+    OpponentSelect,
+    GameIsInvalidModal,
   },
   data() {
     return {
       dummyBoard: [],
-      showModal: false
+      showModal: false,
     };
   },
   computed: {
@@ -96,36 +78,36 @@ export default {
       "board",
       "shots",
       "opponent",
+      "opponentShips",
       "yourTurn",
       "opponentLeft",
 
       "shipsPlaced",
       "gameStarted",
       "gameId",
-      "gameIsInvalid"
+      "gameIsInvalid",
       // "link",
     ]),
     link() {
       return document.URL + "join" + this.gameId;
-    }
+    },
   },
   created() {
     this.dummyBoard = zeros(this.rows, this.cols, 0);
     this.$store.dispatch("initSocket", {
-      handler: this.onGameUpdate
+      handler: this.onGameUpdate,
     });
     window.addEventListener("beforeunload", this.beforeWindowUnload);
   },
 
   methods: {
+    getBoard,
     ...mapActions([
-      "createGameWithFriendOpponent",
-      "createGameWithRandomOpponent",
       "onSocketMessage",
       "updateGame",
       "startGame",
       "leaveGame",
-      "resetGame"
+      "resetGame",
     ]),
     beforeWindowUnload(event) {
       if (this.gameStarted && !this.opponentLeft) {
@@ -141,7 +123,7 @@ export default {
     copyLink() {
       this.$clipboard(this.link);
       alert("Link was copied!");
-    }
-  }
+    },
+  },
 };
 </script>

@@ -1,19 +1,18 @@
 <template>
-  <div class="">
+  <div class="game-status">
     <p
       v-if="!waiting && !isOver && !opponentLeft"
       :class="[
-        'waiting-for-opponent',
-        !waiting && yourTurn ? 'your-turn' : 'opponents-turn'
+        !waiting && yourTurn ? 'status-your-turn' : 'status-opponents-turn ',
       ]"
     >
       It's {{ yourTurn ? "YOUR" : "OPPONENT'S" }} turn.
     </p>
-    <p v-if="waiting" class="waiting-for-opponent">Waiting for an opponent.</p>
-    <p v-if="isOver" :class="youWon ? 'you-won' : 'you-lost'">
+    <p v-if="waiting" class="status-waiting">Waiting for an opponent.</p>
+    <p v-if="isOver" :class="youWon ? 'status-you-won' : 'status-you-lost'">
       Game over. You {{ youWon ? "won!" : "lost!" }}
     </p>
-    <p v-if="opponentLeft && !isOver" class="opponent-left">
+    <p v-if="opponentLeft && !isOver" class="status-opponent-left">
       Opponent has left the game.
     </p>
   </div>
@@ -23,7 +22,7 @@
 import { mapState } from "vuex";
 export default {
   props: {
-    waiting: Boolean
+    waiting: Boolean,
   },
   computed: {
     ...mapState([
@@ -32,8 +31,8 @@ export default {
       "yourTurn",
       "isOver",
       "youWon",
-      "opponentLeft"
-    ])
-  }
+      "opponentLeft",
+    ]),
+  },
 };
 </script>

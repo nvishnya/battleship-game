@@ -1,0 +1,96 @@
+@import "_mixins.scss";
+@import "_color-palette";
+@import "_variables";
+@import "_board";
+@import "_game";
+
+@import url("https://fonts.googleapis.com/css2?family=Special+Elite&display=swap");
+
+html,
+body {
+    min-width: fit-content;
+    height: 100%;
+    margin: 0;
+    overflow: auto;
+}
+*,
+*:focus,
+*:hover {
+    outline: none;
+}
+#app {
+    width: inherit;
+    // height: inherit;
+}
+#background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    min-width: 100%;
+    min-height: 100%;
+    z-index: -100;
+    @include themify {
+        background-color: theme-based("page-background");
+    }
+}
+#app > * {
+    text-align: center;
+    @include themify {
+        color: theme-based("font");
+    }
+    font-family: "Special Elite", cursive !important;
+    font-size: 1.1em;
+    text-transform: uppercase;
+}
+#app-title {
+    margin-top: $margin-size;
+    margin-bottom: 2%;
+    font-size: $title-font-size;
+    text-align: center;
+}
+#app-title span {
+    position: relative;
+}
+#app-title span:before {
+    content: "";
+    position: absolute;
+    top: 100%;
+    width: 100%;
+    left: 0;
+    height: 3px;
+    @include themify {
+        background: linear-gradient(90deg, theme-based("opponent") 50%, theme-based("you") 50%);
+    }
+}
+.button-1 {
+    @include base-button("opponent");
+    &.selected-opponent {
+        @include themify {
+            color: black;
+            background-color: theme-based("opponent");
+        }
+    }
+}
+.leave-button {
+    @include base-button("opponent");
+    @include themify {
+        background-color: theme-based("opponent");
+        color: black;
+        &:hover {
+            background-color: transparent;
+            color: white;
+        }
+    }
+}
+.opponent-select > .button-1 {
+    width: $button-width / 2;
+}
+.opponent-select button:not(:last-child) {
+    border-right: none; /* Prevent double borders */
+}
+$screen-width: 2 * $board-size + 4 * $margin-size + 15px;
+@media screen and (min-width: $screen-width) {
+    .leave-button {
+        margin-left: $button-width + $margin-size * 2;
+    }
+}
