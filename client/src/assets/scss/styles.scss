@@ -13,6 +13,9 @@ body {
     height: 100%;
     margin: 0;
     overflow: auto;
+    @include themify {
+        background-color: theme-based("page-background");
+    }
 }
 *,
 *:focus,
@@ -22,17 +25,6 @@ body {
 #app {
     width: inherit;
     // height: inherit;
-}
-#background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    min-width: 100%;
-    min-height: 100%;
-    z-index: -100;
-    @include themify {
-        background-color: theme-based("page-background");
-    }
 }
 #app > * {
     text-align: center;

@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <div id="background"></div>
     <div id="app-title">
       <span>battleship.</span>
     </div>
@@ -11,7 +10,7 @@
 <script>
 export default {
   mounted() {
-    document.body.classList.add("theme-dark");
+    document.documentElement.classList.add("theme-dark");
   }
 };
 </script>
