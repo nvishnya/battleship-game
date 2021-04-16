@@ -37,12 +37,25 @@ class YouSerializer(serializers.ModelSerializer):
 
 
 class OpponentSerializer(serializers.ModelSerializer):
-    shots = NDarrayField(source='board.shots_with_marked')
-    shot_ships = ShipSerializer(source='board.shot_ships', many=True)
+    shots = serializers.SerializerMethodField()
+    shot_ships = serializers.SerializerMethodField()
+    
+    def _get_shot_ships(self, obj):
+        if not hasattr(self, '_shot_ships'):
+            self._shot_ships = obj.board.shot_ships
+        return self._shot_ships
     
     class Meta:
         model = Player
         fields = ['shots', 'shot_ships']
+
+    def get_shots(self, obj):
+        shot_ships = self._get_shot_ships(obj)
+        data = obj.board.get_shots_with_marked(shot_ships)
+        return NDarrayField().to_representation(data)
+
+    def get_shot_ships(self, obj):
+        return ShipSerializer(self._get_shot_ships(obj), many=True).data
 
 
 class GameSerializer(serializers.ModelSerializer):

@@ -5,6 +5,8 @@ from builtins import staticmethod
 from django.db import models
 from scipy import signal
 import numpy as np
+from django.db.models.aggregates import Count
+from django.db.models.query import Prefetch
 
 
 def delete_if_exists(model, attribute, value):
@@ -67,11 +69,11 @@ class Board(models.Model):
 
     @property
     def shot_ships(self):
-        return [ship for ship in self.ship_set.all() if not ship.is_alive]
+        ships = Ship.prefetch_coordinate_set(self, False)
+        return [ship for ship in ships if ship.coordinate_set.count() == 0]
 
-    @property
-    def shots_with_marked(self):
-        data = [model_to_dict(ship) for ship in self.ship_set.all() if not ship.is_alive]
+    def get_shots_with_marked(self, shot_ships):
+        data = [model_to_dict(ship) for ship in shot_ships]
         return Board._mark_surrounding_cells(self.shots, *data)
 
     def shoot(self, x, y):
@@ -139,7 +141,7 @@ class Board(models.Model):
 
     @property
     def ships_alive(self):
-        return len([x for x in self.ship_set.all() if x.is_alive])
+        return len(Ship.get_alive_ships(self))
 
     @property
     def all_ships_are_shot(self):
@@ -250,6 +252,17 @@ class Ship(models.Model):
     y = models.IntegerField()
     rows = models.IntegerField()
     cols = models.IntegerField()
+
+    @staticmethod
+    def prefetch_coordinate_set(board, is_hit):
+        return Ship.objects.filter(board=board).prefetch_related(
+            Prefetch('coordinate_set', queryset=Coordinate.objects.filter(is_hit=is_hit))
+        )
+
+    @staticmethod
+    def get_alive_ships(board):
+        ships = Ship.prefetch_coordinate_set(board, is_hit=False)
+        return [ship for ship in ships if ship.coordinate_set.count() != 0]
 
     @property
     def is_alive(self):
