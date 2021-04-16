@@ -2,13 +2,14 @@ $themes: (
   dark: (
     font: white,
     page-background: #0d1117,
-    // title-underline: linear-gradient(90deg, black 50%, orange 50%),
-    board-cell-border: rgba(255, 255, 255, 0.5),
+    board-cell-border: transparent,
     player: black,
+    square: #1f2733,
     table-border: #fff700,
     you: #ff355e,
     opponent: #b2f302,
-    win: #00EB84,
+    win: #31ceaa,
+    hit: white,
     lose: #ff0000,
   ),
 );

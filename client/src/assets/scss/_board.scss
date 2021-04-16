@@ -31,12 +31,8 @@ $players: "you", "opponent";
             &.#{$player} .shot-miss {
                 background-color: theme-based($player);
             }
-        }
-        tr:nth-of-type(odd) td:nth-of-type(odd) {
-            background-color: #1f2733;
-        }
-
-        tr:nth-of-type(even) td:nth-of-type(even) {
+            tr:nth-of-type(odd) td:nth-of-type(odd),
+            tr:nth-of-type(even) td:nth-of-type(even) {
             background-color: #1f2733;
         }
     }
@@ -63,6 +59,9 @@ $players: "you", "opponent";
 }
 
 .board-cell {
+    @include themify {
+        border: $cell-border solid theme-based("board-cell-border");
+    }
     padding: 0;
     width: $cell-size;
     height: $cell-size;
@@ -83,6 +82,9 @@ $players: "you", "opponent";
         font-size: $cell-size + 3px;
         content: "\d7";
         z-index: 33;
+        @include themify {
+            color: theme-based("hit");
+        }
     }
 }
 
