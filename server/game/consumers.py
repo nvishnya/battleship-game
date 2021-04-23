@@ -40,7 +40,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         if game_to_join_id is not None and not await can_game_be_joined(game_to_join_id):
             await self.send_json({'type': 'game.invalid'})
             return
-        await place_ships(self.player_id, ships)
+        await place_ships(self.player, ships)
         if friend_as_opponent:
             await self.game_with_a_friend_opponent(game_to_join_id)
         else:

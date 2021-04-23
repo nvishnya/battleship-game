@@ -100,13 +100,15 @@ def test_board_mark_surrounding_cells(db, board10x10):
     assert marked[marked == Board.MISS].size == 3
 
 
-def test_board_shots_with_marked(db, board10x10):
-    #     marks surrounding cells only for sunken ships
+def test_board_get_shots_with_marked(db, board10x10):
+    #     #     marks surrounding cells only for sunken ships
     board10x10.place_ships(ship1x3_at4x4_data)
     ship = board10x10.ship_set.all()[0]
-    assert board10x10.shots_with_marked[board10x10.shots_with_marked == Board.MISS].size == 0
+    shots_with_marked = board10x10.get_shots_with_marked(board10x10.shot_ships)
+    assert shots_with_marked[shots_with_marked == Board.MISS].size == 0
     ship.coordinate_set.all().update(is_hit=True)
-    assert board10x10.shots_with_marked[board10x10.shots_with_marked == Board.MISS].size == 12
+    shots_with_marked = board10x10.get_shots_with_marked(board10x10.shot_ships)
+    assert shots_with_marked[shots_with_marked == Board.MISS].size == 12
 
 
 def test_board_place_ships(db, board10x10):
@@ -158,21 +160,6 @@ def test_ship_orientation(db, ship1x4_at0x0, ship2x1_at4x4):
     assert ship2x1_at4x4.orientation == 'VR'
 
 
-def test_ship_parts_left(db, ship2x1_at4x4):
-    assert ship2x1_at4x4.parts_left == 2
-    coordinates = ship2x1_at4x4.coordinate_set.all()
-    coordinates[0].hit()
-    assert ship2x1_at4x4.parts_left == 1
-
-
-def test_ship_is_alive(db, ship2x1_at4x4):
-    assert ship2x1_at4x4.is_alive
-    coordinates = ship2x1_at4x4.coordinate_set.all()
-    for coordinate in coordinates:
-        coordinate.hit()
-    assert not ship2x1_at4x4.is_alive
-
-
 def test_ship_indicies(db, ship2x1_at4x4):
     assert ship2x1_at4x4.indicies == (slice(4, 6), slice(4, 5))
 
@@ -187,8 +174,8 @@ def test_ship_generate_random_ship(db):
 
 @pytest.fixture
 def game_factory(db):
-    def create_game(rows, cols, playerA=None, playerB=None):
-        return Game.create(playerA, playerB, rows, cols)
+    def create_game(rows, cols, playerA_id=None, playerB_id=None):
+        return Game.create(playerA_id, playerB_id, rows, cols)
     return create_game
 
 
@@ -196,7 +183,7 @@ def game_factory(db):
 def gameAB(db, game_factory, board_factory, player_factory):
     playerA = board_factory(player_factory('channelA')).player
     playerB = board_factory(player_factory('channelB')).player
-    return game_factory(10, 10, playerA, playerB)
+    return game_factory(10, 10, playerA.id, playerB.id)
 
 
 @pytest.fixture
@@ -215,13 +202,15 @@ def test_game_next_player(db, gameAB):
     gameAB.next_player()
     assert gameAB.current == gameAB.playerB
 
+#  FIX
+
 
 def test_game_add_player_to_game(db, game, playerA, playerB, playerC):
-    assert game.add_player_to_game(playerA)
+    assert game.add_player_to_game(playerA.id)
     assert game.playerA.id == playerA.id
-    assert game.add_player_to_game(playerB)
+    assert game.add_player_to_game(playerB.id)
     assert game.playerB.id == playerB.id
-    assert not game.add_player_to_game(playerC)
+    assert not game.add_player_to_game(playerC.id)
 
 
 def test_game_shoot(db, gameAB):
@@ -274,8 +263,8 @@ def test_player_create_board_and_place_ships(db, playerC):
 
 def test_player_update_player_statuses(db, playerA, ):
     assert not playerA.is_busy
-    Player.update_players_statuses(playerA, None)
-    assert playerA.is_busy
+    Player.update_players_statuses(playerA.id, None)
+    assert Player.objects.get(pk=playerA.id).is_busy
 
 
 def test_player_leave_game(db, gameAB):

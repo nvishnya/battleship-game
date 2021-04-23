@@ -12,7 +12,7 @@ from django.db.models.query import Prefetch
 def delete_if_exists(model, attribute, value):
     queryset = model.objects.filter(**{attribute: value})
     if queryset.count() != 0:
-        queryset[0].delete()
+        queryset.delete()
         return True
     return False
 
@@ -32,10 +32,7 @@ class Player(models.Model):
 
     @staticmethod
     def update_players_statuses(*players):
-        for player in players:
-            if player is None:
-                continue
-            player.set_busy()
+        Player.objects.filter(pk__in=players).update(is_busy=True)
 
     @staticmethod
     def get_random_available_player(player):
@@ -80,8 +77,7 @@ class Board(models.Model):
         if self.board[x, y] > 0:
             self.shots[x, y] = Board.HIT
             self.board[x, y] = -1
-            coordinate = Coordinate.objects.get(x=x, y=y, ship__board=self)
-            coordinate.hit()
+            Coordinate.objects.filter(x=x, y=y, ship__board=self).update(is_hit=True)
             self.save(update_fields=['shots', 'board'])
             return True
         else:
@@ -200,31 +196,31 @@ class Game(models.Model):
                                 related_name="playerB", null=True, blank=True)
 
     @staticmethod
-    def create(playerA, playerB=None, rows=10, cols=10):
+    def create(playerA_id, playerB_id=None, rows=10, cols=10):
         game = Game.objects.create(rows=rows,
                                    cols=cols,
-                                   playerA=playerA,
-                                   playerB=playerB,
-                                   current=playerA)
+                                   playerA_id=playerA_id,
+                                   playerB_id=playerB_id,
+                                   current_id=playerA_id)
 
-        Player.update_players_statuses(playerA, playerB)
+        Player.update_players_statuses(playerA_id, playerB_id)
         return game
 
     def end_game(self):
         self.is_over = True
         self.save(update_fields=['is_over'])
 
-    def add_player_to_game(self, player):
+    def add_player_to_game(self, player_id):
         if self.playerA is None:
-            self.playerA = player
-            self.current = player
+            self.playerA_id = player_id
+            self.current_id = player_id
         elif self.playerB is None:
-            self.playerB = player
+            self.playerB_id = player_id
         else:
             return False
 
         self.save(update_fields=['playerA', 'playerB', 'current'])
-        Player.update_players_statuses(player)
+        Player.update_players_statuses(player_id)
         return True
 
     def next_player(self):
@@ -265,20 +261,12 @@ class Ship(models.Model):
         return [ship for ship in ships if ship.coordinate_set.count() != 0]
 
     @property
-    def is_alive(self):
-        return self.parts_left != 0
-
-    @property
     def orientation(self):
         return 'VR' if self.rows > self.cols else 'HR'
 
     @property
     def length(self):
         return int(np.maximum(self.rows, self.cols))
-
-    @property
-    def parts_left(self):
-        return self.coordinate_set.all().filter(is_hit=False).count()
 
     @property
     def indicies(self):
@@ -317,7 +305,3 @@ class Coordinate(models.Model):
     y = models.IntegerField()
     is_hit = models.BooleanField(default=False)
     ship = models.ForeignKey(Ship, on_delete=models.deletion.CASCADE)
-
-    def hit(self):
-        self.is_hit = True
-        self.save(update_fields=['is_hit'])
