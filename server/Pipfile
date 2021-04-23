@@ -22,6 +22,7 @@ daphne = "*"
 mysqlclient = "*"
 django-cors-headers = "*"
 dj-database-url = "*"
+psycopg2 = "*"
 
 [requires]
 python_version = "3.8"

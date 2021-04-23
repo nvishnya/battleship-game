@@ -105,10 +105,10 @@ CHANNEL_LAYERS = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'battleship-db',
-        'USER': 'root',
-        'PASSWORD': '',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'battleship_db',
+        'USER': 'battleship_user',
+        'PASSWORD': 'battleship',
         'HOST': 'localhost',
         'PORT': ''
     }
