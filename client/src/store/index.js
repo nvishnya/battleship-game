@@ -20,7 +20,8 @@ const initialState = {
   shots: [],
   opponent: [],
   opponentShips: [],
-  gameIsInvalid: false
+  gameIsInvalid: false,
+  loading: false
 };
 
 const mutate = (state, prop, value) => {
@@ -93,6 +94,9 @@ export default new Vuex.Store({
     addListeners: (state, handler) => {
       state.handler = handler;
       state.socket.onmessage = handler;
+    },
+    setLoading(state, loading) {
+      state.loading = loading;
     }
   },
 
@@ -124,10 +128,12 @@ export default new Vuex.Store({
     },
 
     async randomizeShips({ state, commit }) {
+      commit("setLoading", true);
       const response = await axios.get(
         `${process.env.VUE_APP_API_URL}random-board/?rows=${state.rows}&cols=${state.cols}`
       );
       commit("updateShips", response.data);
+      commit("setLoading", false);
     },
 
     startGame({ state, dispatch }) {

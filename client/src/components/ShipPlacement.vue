@@ -1,5 +1,11 @@
 <template>
   <div v-if="board" class="board ship-placement">
+    <looping-rhombuses-spinner
+      v-if="loading"
+      :animation-duration="2500"
+      :rhombus-size="15"
+      :color="'#ff1d5e'"
+    />
     <table class="board-table">
       <tbody>
         <tr v-for="(_, row) in rows" :key="row">
@@ -17,7 +23,7 @@
                   getShipClassName(
                     ships[board[row][col]]['length'],
                     ships[board[row][col]]['orientation']
-                  )
+                  ),
                 ]"
                 draggable="true"
                 @dragstart="onDragStart($event, board[row][col])"
@@ -28,14 +34,14 @@
         </tr>
       </tbody>
     </table>
-    <button class="button-1" @click="randomizeShips">
-      randomize ships
-    </button>
+    <button class="button-1" @click="randomizeShips">randomize ships</button>
   </div>
 </template>
 
 <script>
 import { mapActions, mapState } from "vuex";
+import { LoopingRhombusesSpinner } from "epic-spinners";
+
 import {
   getBoard,
   getClicked,
@@ -46,20 +52,24 @@ import {
   isPlacementPossible,
   placeShips,
   rotateMatrix,
-  zeros
+  zeros,
 } from "../helpers";
+
 var _ = require("lodash");
 
 export default {
   props: {
     rows: Number,
-    cols: Number
+    cols: Number,
+  },
+  components: {
+    LoopingRhombusesSpinner,
   },
   computed: {
-    ...mapState(["ships"]),
+    ...mapState(["ships", "loading"]),
     board() {
       return getBoard(this.rows, this.cols, this.ships);
-    }
+    },
   },
   methods: {
     ...mapActions(["randomizeShips"]),
@@ -145,7 +155,7 @@ export default {
       if (isPlacementPossible(currentBoard, ship, this.rows, this.cols)) {
         this.$set(this.ships, shipIndex, ship);
       }
-    }
-  }
+    },
+  },
 };
 </script>

@@ -33,7 +33,7 @@ $players: "you", "opponent";
             }
             tr:nth-of-type(odd) td:nth-of-type(odd),
             tr:nth-of-type(even) td:nth-of-type(even) {
-                background-color: theme-based('square');
+                background-color: theme-based("square");
             }
         }
     }
@@ -91,6 +91,7 @@ $players: "you", "opponent";
 
 // move border to mixin --->
 .ship-placement {
+    position: relative;
     & > .board-table {
         @include themify {
             border: 3px solid theme-based("you");

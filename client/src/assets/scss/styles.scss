@@ -99,3 +99,9 @@ $screen-width: 2 * $board-size + 4 * $margin-size + 15px;
         cursor: pointer;
     }
 }
+.looping-rhombuses-spinner {
+    position: absolute !important;
+    top: calc(50% - #{$margin-size});
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
