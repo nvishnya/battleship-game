@@ -11,7 +11,7 @@ https://battleship-game-client.herokuapp.com/
 - **python3-dev** package
 - **pipenv**
 - **Docker** and **Redis**
-- **Node.js v14** or hiegher and **npm**
+- **Node.js v14** or higher and **npm**
 - **PostgreSQL** configured as in settings.py DATABASES
 
 # Quickstart
